@@ -20,7 +20,8 @@ async function startApi() {
   app.use(express.json({ limit: 2e6 }));
 
   //LOAD ROUTES
-  app.use(require("./controllers/App.routes"));
+  app.use(require("../routes/App.routes"));
+  app.use(require("../routes/Group.routes"));
 
   app.listen(process.env.PORT, () => {
     console.log("Servidor ouvindo na porta: " + process.env.PORT);
