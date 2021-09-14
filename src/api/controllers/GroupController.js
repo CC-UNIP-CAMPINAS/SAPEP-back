@@ -1,7 +1,7 @@
 const database = require("../services/sequelize/models");
 
 class GroupController {
-  static async getAll(req, res) {
+  static async getAll(_, res) {
     try {
       const allGroups = await database.Group.findAll();
       return res.status(200).json(allGroups);
