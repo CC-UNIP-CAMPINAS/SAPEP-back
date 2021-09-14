@@ -9,20 +9,29 @@ datasource db {
 
 model Groups {
   id        Int      @id @default(autoincrement())
-  nome      String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
+  nome      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
 }
 
 model Jwts {
-  id        Int       @id @default(autoincrement())
-  token     String?   @db.VarChar(255)
-  expire    DateTime? @db.DateTime(0)
-  idUser    Int?
-  createdAt DateTime  @db.DateTime(0)
-  updatedAt DateTime  @db.DateTime(0)
+  id        Int      @id @default(autoincrement())
+  token     String   @db.VarChar(255)
+  expire    DateTime @db.DateTime(0)
+  idUser    Int
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+
+  User User @relation(fields: [idUser], references: [id], onDelete: Cascade, map: "PK_IDUSER_JWT")
+
+  @@index([idUser], map: "PK_IDUSER_JWT")
 }
 
-model SequelizeMeta {
-  name String @id @unique(map: "name") @db.VarChar(255)
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String
+  password  String
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+  Jwts      Jwts[]
 }
