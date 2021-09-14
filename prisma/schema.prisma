@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Groups {
+  id        Int      @id @default(autoincrement())
+  nome      String?  @db.VarChar(255)
+  createdAt DateTime @db.DateTime(0)
+  updatedAt DateTime @db.DateTime(0)
+}
+
+model Jwts {
+  id        Int       @id @default(autoincrement())
+  token     String?   @db.VarChar(255)
+  expire    DateTime? @db.DateTime(0)
+  idUser    Int?
+  createdAt DateTime  @db.DateTime(0)
+  updatedAt DateTime  @db.DateTime(0)
+}
+
+model SequelizeMeta {
+  name String @id @unique(map: "name") @db.VarChar(255)
+}
