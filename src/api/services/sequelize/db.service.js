@@ -1,12 +1,12 @@
 const sequelize = require("./models/index").sequelize;
 
 async function testConnection() {
-  try {
-    await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
+    try {
+        await sequelize.authenticate();
+        console.log("Conexão com o banco de dados feita com sucesso!");
+    } catch (error) {
+        console.error("Erro ao tentar se conectar ao banco de dados:", error);
+    }
 }
 
-testConnection();
+module.exports = { testConnection, sequelize };
