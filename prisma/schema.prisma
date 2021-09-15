@@ -7,31 +7,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Groups {
-  id        Int      @id @default(autoincrement())
-  nome      String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @db.DateTime(0)
+model User {
+  id        Int         @id @default(autoincrement())
+  email     String
+  password  String
+  groupId   Int
+  createdAt DateTime    @default(now()) @db.DateTime(0)
+  updatedAt DateTime    @updatedAt @db.DateTime(0)
+  Jwts      Jwt[]
+  LinkReset LinkReset[]
+
+  Groups Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
-model Jwts {
+model Jwt {
   id        Int      @id @default(autoincrement())
   token     String   @db.VarChar(255)
   expire    DateTime @db.DateTime(0)
   idUser    Int
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
 
-  User User @relation(fields: [idUser], references: [id], onDelete: Cascade, map: "PK_IDUSER_JWT")
+  User User @relation(fields: [idUser], references: [id], onDelete: Cascade)
 
-  @@index([idUser], map: "PK_IDUSER_JWT")
+  @@index([idUser])
 }
 
-model User {
+model Group {
   id        Int      @id @default(autoincrement())
-  email     String
-  password  String
+  nome      String   @db.VarChar(255)
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @db.DateTime(0)
-  Jwts      Jwts[]
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  groupPermission GroupPermission[]
+  User            User[]
+}
+
+model Permission {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  groupPermission GroupPermission[]
+}
+
+model GroupPermission {
+  group        Group      @relation(fields: [permissionId], references: [id])
+  groupId      Int
+  permission   Permission @relation(fields: [groupId], references: [id])
+  permissionId Int
+
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  @@id([groupId, permissionId])
+}
+
+model LinkReset {
+  id     Int      @id @default(autoincrement())
+  link   String   @db.VarChar(255)
+  expire DateTime @db.DateTime(0)
+  idUser Int
+
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  User User @relation(fields: [idUser], references: [id], onDelete: Cascade)
 }
