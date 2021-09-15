@@ -10,6 +10,8 @@
     },
     "dependencies": {
         "@prisma/client": "^3.0.2",
+        "bcrypt": "3.0.8",
+        "consign": "^0.1.6",
         "cors": "^2.8.5",
         "dayjs": "^1.10.7",
         "dotenv": "^10.0.0",
