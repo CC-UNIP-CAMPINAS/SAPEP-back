@@ -24,7 +24,7 @@ model Jwt {
   id        Int      @id @default(autoincrement())
   token     String   @db.VarChar(255)
   expire    DateTime @db.DateTime(0)
-  idUser    Int
+  idUser    Int      @unique
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)
 
