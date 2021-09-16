@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id        Int         @id @default(autoincrement())
-  email     String
+  email     String      @unique
   password  String
   groupId   Int?
   createdAt DateTime    @default(now()) @db.DateTime(0)
@@ -54,7 +54,7 @@ model Permission {
 }
 
 model GroupPermission {
-  group        Group      @relation(fields: [permissionId], references: [id],  onDelete: Cascade)
+  group        Group      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   groupId      Int
   permission   Permission @relation(fields: [groupId], references: [id], onDelete: Cascade)
   permissionId Int
