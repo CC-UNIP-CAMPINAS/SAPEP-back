@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon index.js",
-        "migrate": "prisma migrate dev"
+        "migrate": "prisma migrate dev",
+        "sgbd": "prisma studio"
     },
     "dependencies": {
         "@prisma/client": "^3.0.2",
