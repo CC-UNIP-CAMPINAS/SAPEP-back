@@ -1,5 +1,7 @@
-const { hash } = require("bcrypt");
+const { hash, compare } = require("bcrypt");
+const { errorCodes, statusTypes } = require("../config/express.config");
 const PrismaService = require("../services/prisma/prisma.service");
+const JwtController = require("./JwtController");
 
 class UserController {
     constructor() {
@@ -8,21 +10,59 @@ class UserController {
 
     async findAll(_, res) {
         try {
-            const allUsers = await this.user.findMany({});
-            return res.status(200).json(allUsers);
+            const allUsers = await this.user.findMany({
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+            return res.status(errorCodes.OK).json(allUsers);
         } catch (error) {
-            return res.status(500).json(error.message);
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
         }
+    }
+
+    async findOne(email) {
+        return this.user.findFirst({ where: { email } });
     }
 
     async create(req, res) {
         try {
             const password = await hash(req.body.password, 12);
-            const user = await this.user.create({ data: { ...req.body, password } });
-            res.send(200).json(user);
+            const user = await this.user.create({ data: { ...req.body, password }, select: { email: true } });
+            res.status(errorCodes.CREATED).json(user);
         } catch (error) {
-            return res.status(500).json(error.message);
+            if (error.code === "P2002") {
+                return res
+                    .status(errorCodes.INTERNAL_SERVER)
+                    .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Usuário já existe" });
+            }
+            return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
         }
+    }
+
+    async login(req, res) {
+        try {
+            const { email, password } = req.body;
+            const user = await this.findOne(email);
+
+            if (user) {
+                if (await compare(password, user.password)) {
+                    req.idUser = user.id;
+                    const jwt = new JwtController();
+                    await jwt.create(user.id);
+                    return res.status(errorCodes.OK).json({ message: "Acesso permitido.", payload: true });
+                } else {
+                    return res.status(errorCodes.NOT_AUTHORIZED).json({ message: "Acesso negado.", payload: false });
+                }
+            } else {
+                return res.status(errorCodes.NOT_FOUND).json({ message: "Usuário não encontrado." });
+            }
+        } catch (error) {
+            return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
+        }
+    }
+
+    removeSensitiveProperties(user) {
+        delete user.password;
+        return user;
     }
 }
 
