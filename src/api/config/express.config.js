@@ -5,6 +5,7 @@ const app = express();
 
 const errorCodes = {
     OK: 200,
+    CREATED: 201,
     BAD_REQUEST: 400,
     NOT_AUTHORIZED: 401,
     NOT_FOUND: 404,
@@ -19,6 +20,7 @@ const statusTypes = {
     NOT_FOUND: "NOT_FOUND",
     SUCCESS: "SUCCESS",
     LOGOFF: "LOGOFF",
+    UNIQUE_VIOLATION: "UNIQUE_VIOLATION",
 };
 
 async function startApi() {
@@ -39,9 +41,7 @@ async function startApi() {
     app.use(express.json({ limit: 2e6 }));
 
     //LOAD ROUTES
-    consign()
-        .include("src/api/routes")
-        .into(app);
+    consign().include("src/api/routes").into(app);
 
     //START API
     app.listen(process.env.PORT, () => {
