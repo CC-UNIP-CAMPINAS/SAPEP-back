@@ -16,6 +16,10 @@ class JwtController {
         }
     }
 
+    async findOne(token) {
+        return this.jwt.findUnique({ where: { token } });
+    }
+
     async create(idUser) {
         try {
             const token = jwt.sign({}, process.env.JWT_KEY, {

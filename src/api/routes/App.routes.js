@@ -1,4 +1,5 @@
 const AuthController = require("../controllers/AuthController");
+const { verifyJWT } = require("../middlewares/auth.middleware");
 
 module.exports = (app) => {
     const authController = new AuthController();
@@ -9,5 +10,9 @@ module.exports = (app) => {
 
     app.post("/login", (req, res) => {
         authController.login(req, res);
+    });
+
+    app.post("/login-jwt", [verifyJWT], (req, res) => {
+        authController.loginJwt(req, res);
     });
 };
