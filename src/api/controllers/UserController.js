@@ -1,4 +1,5 @@
 const { hash } = require("bcrypt");
+const { errorCodes, statusTypes } = require("../config/express.config");
 const PrismaService = require("../services/prisma/prisma.service");
 
 class UserController {
@@ -8,21 +9,59 @@ class UserController {
 
     async findAll(_, res) {
         try {
-            const allUsers = await this.user.findMany({});
-            return res.status(200).json(allUsers);
+            const allUsers = await this.user.findMany({
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+            return res.status(errorCodes.OK).json(allUsers);
         } catch (error) {
-            return res.status(500).json(error.message);
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
+
+    async findOne(email, isSensible) {
+        if (isSensible) {
+            return this.user.findFirst({
+                where: { email },
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+        } else {
+            return this.user.findFirst({
+                where: { email },
+            });
+        }
+    }
+
+    async findOneById(id, isSensible) {
+        if (isSensible) {
+            return this.user.findUnique({
+                where: { id },
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+        } else {
+            return this.user.findUnique({
+                where: { id },
+            });
         }
     }
 
     async create(req, res) {
         try {
             const password = await hash(req.body.password, 12);
-            const user = await this.user.create({ data: { ...req.body, password } });
-            res.send(200).json(user);
+            const user = await this.user.create({ data: { ...req.body, password }, select: { email: true } });
+            res.status(errorCodes.CREATED).json(user);
         } catch (error) {
-            return res.status(500).json(error.message);
+            if (error.code === "P2002") {
+                return res
+                    .status(errorCodes.INTERNAL_SERVER)
+                    .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Usuário já existe" });
+            }
+            return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
         }
+    }
+
+    removeSensitiveProperties(user) {
+        delete user.password;
+        return user;
     }
 }
 

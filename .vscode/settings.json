@@ -1,0 +1,9 @@
+{
+    "conventionalCommits.scopes": [
+        "JWT",
+        "Prisma",
+        "Auth",
+        "Express",
+        "User"
+    ]
+}
