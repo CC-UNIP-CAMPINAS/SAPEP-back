@@ -40,6 +40,9 @@ async function startApi() {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json({ limit: 2e6 }));
 
+    //COOKIE
+    app.use(require("cookie-parser")());
+
     //LOAD ROUTES
     consign().include("src/api/routes").into(app);
 

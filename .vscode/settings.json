@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "JWT",
         "Prisma",
-        "Auth"
+        "Auth",
+        "Express"
     ]
 }
