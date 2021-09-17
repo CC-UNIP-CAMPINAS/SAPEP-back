@@ -18,8 +18,30 @@ class UserController {
         }
     }
 
-    async findOne(email) {
-        return this.user.findFirst({ where: { email } });
+    async findOne(email, isSensible) {
+        if (isSensible) {
+            return this.user.findFirst({
+                where: { email },
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+        } else {
+            return this.user.findFirst({
+                where: { email },
+            });
+        }
+    }
+
+    async findOneById(id, isSensible) {
+        if (isSensible) {
+            return this.user.findUnique({
+                where: { id },
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+        } else {
+            return this.user.findUnique({
+                where: { id },
+            });
+        }
     }
 
     async create(req, res) {

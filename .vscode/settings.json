@@ -3,6 +3,7 @@
         "JWT",
         "Prisma",
         "Auth",
-        "Express"
+        "Express",
+        "User"
     ]
 }
