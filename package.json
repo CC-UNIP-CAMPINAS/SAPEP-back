@@ -5,6 +5,7 @@
     "license": "MIT",
     "scripts": {
         "start": "node index.js",
+        "predev": "prisma generate",
         "dev": "nodemon index.js",
         "migrate": "prisma migrate dev",
         "sgbd": "prisma studio"
