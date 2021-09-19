@@ -35,7 +35,7 @@ model Jwt {
 
 model Group {
   id        Int      @id @default(autoincrement())
-  nome      String   @db.VarChar(255)
+  name      String   @unique @db.VarChar(255)
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)
 
