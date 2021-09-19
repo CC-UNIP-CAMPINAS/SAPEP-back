@@ -4,7 +4,7 @@ const groupController = new GroupController();
 
 module.exports = (app) => {
     app.get("/group/:id", (req, res) => {
-        groupController.findOne(req, res);
+        groupController.findOneById(req, res);
     });
 
     app.get("/group", (req, res) => {

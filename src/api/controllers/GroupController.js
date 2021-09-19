@@ -6,7 +6,7 @@ class GroupController {
         this.group = new PrismaService().group;
     }
 
-    async findOne(req, res) {
+    async findOneById(req, res) {
         try {
             if (Number.isInteger(+req.params.id)) {
                 //NOTE ou envia vazio e da erro, ou envia algo que não é número
