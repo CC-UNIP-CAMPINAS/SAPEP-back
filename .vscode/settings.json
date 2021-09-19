@@ -4,6 +4,7 @@
         "Prisma",
         "Auth",
         "Express",
-        "User"
+        "User",
+        "Group"
     ]
 }
