@@ -15,5 +15,7 @@ module.exports = (app) => {
         groupController.create(req, res);
     });
 
-    app.delete()
+    app.delete("/group/:id", (req, res) => {
+        groupController.delete(req, res);
+    });
 };

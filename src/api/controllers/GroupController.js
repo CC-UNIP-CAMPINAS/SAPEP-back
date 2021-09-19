@@ -11,10 +11,9 @@ class GroupController {
             if (Number.isInteger(+req.params.id)) {
                 //NOTE ou envia vazio e da erro, ou envia algo que não é número
                 const group = await this.group.findUnique({ where: { id: +req.params.id } });
-                if(group){
+                if (group) {
                     return res.status(200).json(group);
-                }
-                else{
+                } else {
                     return res.status(200).json({});
                 }
             } else {
@@ -50,6 +49,25 @@ class GroupController {
                     .json({ message: "Violação de campos únicos. Grupo não foi criado." });
             }
             return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
+
+    async delete(req, res) {
+        try {
+            if (Number.isInteger(+req.params.id)) {
+                //NOTE ou envia vazio e da erro, ou envia algo que não é número
+                await this.group.delete({ where: { id: +req.params.id } });
+
+                return res.json({ message: "Grupo deletado." });
+            } else {
+                return res.status(errorCodes.BAD_REQUEST).json({ message: "Campos obrigatórios faltantes." });
+            }
+        } catch (error) {
+            if (error.code === "P2025") {
+                return res.status(errorCodes.BAD_REQUEST).json({ message: "Grupo não encontrado" });
+            }
+            console.log(error);
+            return res.status(500).json(error.message);
         }
     }
 }
