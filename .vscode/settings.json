@@ -5,6 +5,7 @@
         "Auth",
         "Express",
         "User",
-        "Group"
+        "Group",
+        "Patient"
     ]
 }

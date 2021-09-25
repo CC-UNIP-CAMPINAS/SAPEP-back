@@ -76,3 +76,16 @@ model LinkReset {
 
   User User @relation(fields: [idUser], references: [id], onDelete: Cascade)
 }
+
+model Patient {
+  id              Int      @id @default(autoincrement())
+  name            String
+  lastName        String
+  addressNumber   Int?
+  cep             String?
+  birthday        DateTime
+  phone           String?
+  healthInsurance String
+  cpf             String
+  rg              String
+}
