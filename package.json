@@ -11,7 +11,7 @@
         "sgbd": "prisma studio"
     },
     "dependencies": {
-        "@prisma/client": "^3.0.2",
+        "@prisma/client": "^3.1.1",
         "bcrypt": "^5.0.1",
         "consign": "^0.1.6",
         "cookie-parser": "^1.4.5",
@@ -25,6 +25,6 @@
     "devDependencies": {
         "jest": "^27.0.6",
         "nodemon": "^2.0.12",
-        "prisma": "^3.0.2"
+        "prisma": "^3.1.1"
     }
 }
