@@ -44,7 +44,16 @@ class NursePrescriptionController {
             });
             res.json(nursePrescription);
         } catch (error) {
-            console.log(error);
+            if (error.code === "P2003") {
+                switch (error.meta.field_name) {
+                    case "prescriberId":
+                        return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescritor não encontrado." });
+                    case "medicalRecordId":
+                        return res.status(errorCodes.BAD_REQUEST).json({ message: "Prontuário não encontrado." });
+                    default:
+                        break;
+                }
+            }
             return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
         }
     }
