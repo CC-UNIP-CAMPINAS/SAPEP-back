@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  email     String      @unique
-  password  String
-  groupId   Int?
-  createdAt DateTime    @default(now()) @db.DateTime(0)
-  updatedAt DateTime    @updatedAt @db.DateTime(0)
-  Jwts      Jwt[]
-  LinkReset LinkReset[]
+  id         Int                 @id @default(autoincrement())
+  email      String              @unique
+  password   String
+  groupId    Int?
+  createdAt  DateTime            @default(now()) @db.DateTime(0)
+  updatedAt  DateTime            @updatedAt @db.DateTime(0)
+  Jwts       Jwt[]
+  LinkReset  LinkReset[]
+  prescriber NursePrescription[] @relation("prescriber")
+  executor   NursePrescription[] @relation("executor")
 
   Groups Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 }
@@ -78,15 +80,38 @@ model LinkReset {
 }
 
 model Patient {
-  id                  Int      @id @default(autoincrement())
+  id                  Int            @id @default(autoincrement())
   name                String
   lastName            String
   addressNumber       Int?
   cep                 String?
-  birthday            DateTime @db.Date
+  birthday            DateTime       @db.Date
   phone               String?
   healthInsurance     String?
   healthInsuranceCode String?
-  cpf                 String   @unique
-  rg                  String   @unique
+  cpf                 String         @unique
+  rg                  String         @unique
+  MedicalRecord       MedicalRecord?
+}
+
+model MedicalRecord {
+  id                Int                 @id @default(autoincrement())
+  patient           Patient             @relation(fields: [patientId], references: [id])
+  patientId         Int
+  nursePrescription NursePrescription[]
+}
+
+model NursePrescription {
+  id               Int           @id @default(autoincrement())
+  prescription     String
+  prescriptionDate DateTime      @default(now())
+  realized         Boolean       @default(false)
+  obs              String
+  executionDate    DateTime?
+  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId  Int
+  Prescriber       User          @relation("prescriber", fields: [prescriberId], references: [id])
+  prescriberId     Int
+  Executor         User          @relation("executor", fields: [executorId], references: [id])
+  executorId       Int
 }
