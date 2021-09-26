@@ -48,6 +48,23 @@ class NursePrescriptionController {
             return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
         }
     }
+
+    async update(req, res) {
+        try {
+            const nursePrescription = await this.nursePrescription.update({
+                where: { id: +req.body.id },
+                data: {
+                    obs: req.body.obs,
+                },
+            });
+            res.json(nursePrescription);
+        } catch (error) {
+            if (error.code === "P2025") {
+                return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição de enfermagem não encontrado." });
+            }
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
 }
 
 module.exports = NursePrescriptionController;

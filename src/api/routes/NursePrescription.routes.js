@@ -12,6 +12,12 @@ module.exports = (app) => {
             prescriberId: Joi.number().required(),
         }),
     };
+    const updateValidation = {
+        body: Joi.object({
+            obs: Joi.string().required(),
+            id: Joi.number().required(),
+        }),
+    };
 
     app.get("/nurse-prescription", (req, res) => {
         nursePrescriptionController.findAll(req, res);
@@ -21,5 +27,8 @@ module.exports = (app) => {
     });
     app.get("/nurse-prescription/:id", (req, res) => {
         nursePrescriptionController.findOneById(req, res);
+    });
+    app.patch("/nurse-prescription", validate(updateValidation), (req, res) => {
+        nursePrescriptionController.update(req, res);
     });
 };
