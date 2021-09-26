@@ -32,6 +32,22 @@ class NursePrescriptionController {
             return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
         }
     }
+
+    async create(req, res) {
+        try {
+            const nursePrescription = await this.nursePrescription.create({
+                data: {
+                    ...req.body,
+                    medicalRecordId: +req.body.medicalRecordId,
+                    prescriberId: +req.body.prescriberId,
+                },
+            });
+            res.json(nursePrescription);
+        } catch (error) {
+            console.log(error);
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
 }
 
 module.exports = NursePrescriptionController;

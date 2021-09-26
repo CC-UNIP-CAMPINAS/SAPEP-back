@@ -1,5 +1,6 @@
 const express = require("express");
 var consign = require("consign");
+const { ValidationError } = require("express-validation");
 
 const app = express();
 
@@ -47,6 +48,15 @@ async function startApi() {
 
     //LOAD ROUTES
     consign().include("src/api/routes").into(app);
+
+    //TRATA ERROS DE VALIDAÇÃO DE BODY
+    app.use(function (err, req, res, next) {
+        if (err instanceof ValidationError) {
+            return res.status(err.statusCode).json(err);
+        }
+
+        return res.status(500).json(err);
+    });
 
     //START API
     app.listen(process.env.PORT, () => {
