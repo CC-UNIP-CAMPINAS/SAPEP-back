@@ -106,12 +106,12 @@ model NursePrescription {
   prescription     String
   prescriptionDate DateTime      @default(now())
   realized         Boolean       @default(false)
-  obs              String
+  obs              String?
   executionDate    DateTime?
   MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId  Int
   Prescriber       User          @relation("prescriber", fields: [prescriberId], references: [id])
   prescriberId     Int
-  Executor         User          @relation("executor", fields: [executorId], references: [id])
-  executorId       Int
+  Executor         User?         @relation("executor", fields: [executorId], references: [id])
+  executorId       Int?
 }
