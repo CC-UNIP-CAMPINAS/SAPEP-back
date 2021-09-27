@@ -12,10 +12,18 @@ module.exports = (app) => {
             prescriberId: Joi.number().required(),
         }),
     };
+
     const updateValidation = {
         body: Joi.object({
             obs: Joi.string().required(),
             id: Joi.number().required(),
+        }),
+    };
+
+    const updateRealizedValidation = {
+        body: Joi.object({
+            id: Joi.number().required(),
+            executorId: Joi.number().required(),
         }),
     };
 
@@ -30,5 +38,8 @@ module.exports = (app) => {
     });
     app.patch("/nurse-prescription", validate(updateValidation), (req, res) => {
         nursePrescriptionController.update(req, res);
+    });
+    app.patch("/nurse-prescription/set-realized", validate(updateRealizedValidation), (req, res) => {
+        nursePrescriptionController.setRealized(req, res);
     });
 };

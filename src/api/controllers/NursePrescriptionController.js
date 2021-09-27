@@ -1,4 +1,4 @@
-const { errorCodes, statusTypes } = require("../config/express.config");
+const { errorCodes } = require("../config/express.config");
 const PrismaService = require("../services/prisma/prisma.service");
 
 class NursePrescriptionController {
@@ -67,6 +67,37 @@ class NursePrescriptionController {
                 },
             });
             res.json(nursePrescription);
+        } catch (error) {
+            if (error.code === "P2025") {
+                return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição de enfermagem não encontrado." });
+            }
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
+
+    async setRealized(req, res) {
+        try {
+            const nursePrescription = await this.nursePrescription.findUnique({
+                where: { id: +req.body.id },
+                select: { realized: true },
+            });
+
+            if (!nursePrescription)
+                return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição de enfermagem não encontrado." });
+
+            if (!nursePrescription.realized) {
+                const nursePrescription = await this.nursePrescription.update({
+                    where: { id: +req.body.id },
+                    data: {
+                        executorId: +req.body.executorId,
+                        realized: true,
+                        executionDate: new Date(),
+                    },
+                });
+                return res.json(nursePrescription);
+            }
+
+            res.status(errorCodes.CONFLICT).json({ message: "Está prescrição já foi realizada." });
         } catch (error) {
             if (error.code === "P2025") {
                 return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição de enfermagem não encontrado." });
