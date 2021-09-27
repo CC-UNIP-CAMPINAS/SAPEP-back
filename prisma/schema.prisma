@@ -8,16 +8,19 @@ datasource db {
 }
 
 model User {
-  id         Int                 @id @default(autoincrement())
-  email      String              @unique
-  password   String
-  groupId    Int?
-  createdAt  DateTime            @default(now()) @db.DateTime(0)
-  updatedAt  DateTime            @updatedAt @db.DateTime(0)
-  Jwts       Jwt[]
-  LinkReset  LinkReset[]
-  prescriber NursePrescription[] @relation("prescriber")
-  executor   NursePrescription[] @relation("executor")
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  password  String
+  groupId   Int?
+  createdAt DateTime    @default(now()) @db.DateTime(0)
+  updatedAt DateTime    @updatedAt @db.DateTime(0)
+  Jwts      Jwt[]
+  LinkReset LinkReset[]
+
+  NursePrescriber      NursePrescription[]   @relation("nursePrescriber")
+  NurseExecutor        NursePrescription[]   @relation("nurseExecutor")
+  MedicalPrescriber    MedicalPrescription[] @relation("medicalPrescriber")
+  NurseExecutorMedical MedicalPrescription[] @relation("nurseExecutorMedical")
 
   Groups Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 }
@@ -95,10 +98,11 @@ model Patient {
 }
 
 model MedicalRecord {
-  id                Int                 @id @default(autoincrement())
-  patient           Patient             @relation(fields: [patientId], references: [id])
-  patientId         Int
-  nursePrescription NursePrescription[]
+  id                  Int                   @id @default(autoincrement())
+  patient             Patient               @relation(fields: [patientId], references: [id])
+  patientId           Int
+  nursePrescription   NursePrescription[]
+  MedicalPrescription MedicalPrescription[]
 }
 
 model NursePrescription {
@@ -110,8 +114,28 @@ model NursePrescription {
   executionDate    DateTime?
   MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId  Int
-  Prescriber       User          @relation("prescriber", fields: [prescriberId], references: [id])
+  Prescriber       User          @relation("nursePrescriber", fields: [prescriberId], references: [id])
   prescriberId     Int
-  Executor         User?         @relation("executor", fields: [executorId], references: [id])
+  Executor         User?         @relation("nurseExecutor", fields: [executorId], references: [id])
   executorId       Int?
+}
+
+model MedicalPrescription {
+  id                     Int      @id @default(autoincrement())
+  drug                   String
+  drugDosage             String
+  drugWay                String
+  administrationInterval String
+  prescriptionDate       DateTime @default(now())
+
+  realized      Boolean   @default(false)
+  obs           String?
+  executionDate DateTime?
+
+  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId Int
+  Prescriber      User          @relation("medicalPrescriber", fields: [prescriberId], references: [id])
+  prescriberId    Int
+  Executor        User?         @relation("nurseExecutorMedical", fields: [executorId], references: [id])
+  executorId      Int?
 }
