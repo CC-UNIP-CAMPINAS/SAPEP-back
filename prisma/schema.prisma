@@ -22,7 +22,8 @@ model User {
   MedicalPrescriber    MedicalPrescription[] @relation("medicalPrescriber")
   NurseExecutorMedical MedicalPrescription[] @relation("nurseExecutorMedical")
 
-  Groups Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  Groups      Group?        @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  NurseReport NurseReport[]
 }
 
 model Jwt {
@@ -103,6 +104,7 @@ model MedicalRecord {
   patientId           Int
   nursePrescription   NursePrescription[]
   MedicalPrescription MedicalPrescription[]
+  NurseReport         NurseReport[]
 }
 
 model NursePrescription {
@@ -118,6 +120,7 @@ model NursePrescription {
   prescriberId     Int
   Executor         User?         @relation("nurseExecutor", fields: [executorId], references: [id])
   executorId       Int?
+  NurseReport      NurseReport?
 }
 
 model MedicalPrescription {
@@ -138,4 +141,19 @@ model MedicalPrescription {
   prescriberId    Int
   Executor        User?         @relation("nurseExecutorMedical", fields: [executorId], references: [id])
   executorId      Int?
+  NurseReport     NurseReport?
+}
+
+model NurseReport {
+  id                    Int                  @id @default(autoincrement())
+  reportDate            DateTime             @default(now())
+  report                String
+  signatory             User                 @relation(fields: [signatoryId], references: [id])
+  signatoryId           Int
+  MedicalRecord         MedicalRecord        @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId       Int
+  MedicalPrescription   MedicalPrescription? @relation(fields: [medicalPrescriptionId], references: [id])
+  medicalPrescriptionId Int?
+  NursePrescription     NursePrescription?   @relation(fields: [nursePrescriptionId], references: [id])
+  nursePrescriptionId   Int?
 }
