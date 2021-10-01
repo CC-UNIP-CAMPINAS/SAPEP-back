@@ -15,4 +15,9 @@ module.exports = (app) => {
     app.post("/login-jwt", [verifyJWT], (req, res) => {
         authController.loginJwt(req, res);
     });
+
+    app.get("/logoff", [verifyJWT], (_, res) => {
+        res.clearCookie("sapep_token");
+        res.json({ message: "Usuário deslogado" });
+    });
 };
