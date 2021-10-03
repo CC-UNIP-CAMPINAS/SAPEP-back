@@ -1,4 +1,5 @@
-const { PrismaClient } =require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
+const { hash } = require("bcrypt");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -11,6 +12,12 @@ async function main() {
     ];
 
     await prisma.group.createMany({ data: groups, skipDuplicates: true });
+
+    const password = await hash("sapep123", 12);
+    await prisma.user.createMany({
+        data: { email: "root@sapep.com", groupId: 5, name: "root", id: 0, password },
+        skipDuplicates: true,
+    });
 }
 
 main()
