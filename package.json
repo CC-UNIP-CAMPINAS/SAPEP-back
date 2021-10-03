@@ -11,7 +11,8 @@
         "predev": "prisma generate",
         "dev": "nodemon index.js",
         "migrate": "prisma migrate dev",
-        "sgbd": "prisma studio"
+        "sgbd": "prisma studio",
+        "uml": "npx prisma-uml ./prisma/schema.prisma -o svg -f ./prisma/uml/schemas_uml.svg"
     },
     "dependencies": {
         "@prisma/client": "^3.1.1",
