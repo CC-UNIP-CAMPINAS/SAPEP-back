@@ -31,7 +31,6 @@ model User {
 }
 
 model Doctor {
-  id     Int    @id @default(autoincrement())
   crm    String @unique
   area   String
   user   User   @relation(fields: [userId], references: [id])
