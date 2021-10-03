@@ -1,6 +1,6 @@
 const { hash } = require("bcrypt");
-const { errorCodes, statusTypes } = require("../config/express.config");
-const PrismaService = require("../services/prisma/prisma.service");
+const { errorCodes, statusTypes } = require("../../config/express.config");
+const PrismaService = require("../../services/prisma/prisma.service");
 
 class UserController {
     constructor() {

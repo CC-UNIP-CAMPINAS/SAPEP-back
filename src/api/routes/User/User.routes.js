@@ -1,4 +1,4 @@
-const UserController = require("../controllers/UserController");
+const UserController = require("../../controllers/User/UserController");
 const { validate, Joi } = require("express-validation");
 
 const userController = new UserController();

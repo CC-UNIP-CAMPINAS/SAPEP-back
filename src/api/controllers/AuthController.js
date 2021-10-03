@@ -1,7 +1,7 @@
 const { compare } = require("bcrypt");
 const { errorCodes } = require("../config/express.config");
 const JwtController = require("./JwtController");
-const UserController = require("./UserController");
+const UserController = require("./User/UserController");
 
 class AuthController {
     constructor() {
