@@ -34,11 +34,12 @@ class UserController {
         if (isSensible) {
             return this.user.findFirst({
                 where: { email },
-                select: { email: true, groupId: true, id: true, createdAt: true },
+                select: { email: true, groupId: true, id: true, createdAt: true, Doctor: true },
             });
         } else {
             return this.user.findFirst({
                 where: { email },
+                include: { Doctor: true },
             });
         }
     }
@@ -47,11 +48,12 @@ class UserController {
         if (isSensible) {
             return this.user.findUnique({
                 where: { id },
-                select: { email: true, groupId: true, id: true, createdAt: true },
+                select: { email: true, groupId: true, id: true, createdAt: true, Doctor: true },
             });
         } else {
             return this.user.findUnique({
                 where: { id },
+                include: { Doctor: true },
             });
         }
     }

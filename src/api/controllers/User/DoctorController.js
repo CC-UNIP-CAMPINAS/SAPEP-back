@@ -46,9 +46,11 @@ class DoctorController {
             const userParams = { ...req.body };
             delete userParams["crm"];
             delete userParams["area"];
+            delete userParams["groupId"];
 
             const user = await this.user.create({
-                data: { ...userParams, password, Doctor: { create: doctorParams } },
+                data: { ...userParams, Groups: { connect: { id: 1 } }, password, Doctor: { create: doctorParams } },
+                include: { Doctor: true },
             });
             res.status(errorCodes.CREATED).json(user);
         } catch (error) {
