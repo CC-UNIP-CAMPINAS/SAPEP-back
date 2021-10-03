@@ -5,6 +5,11 @@
         "Auth",
         "Express",
         "User",
-        "Group"
+        "Group",
+        "Patient",
+        "NursePrescription",
+        "MedicalPrescription",
+        "Doctor",
+        "Login"
     ]
 }

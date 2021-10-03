@@ -14,10 +14,27 @@ model User {
   groupId   Int?
   createdAt DateTime    @default(now()) @db.DateTime(0)
   updatedAt DateTime    @updatedAt @db.DateTime(0)
+  phone     String?
+  gender    String      @default("INDEFINIDO")
+  name      String
   Jwts      Jwt[]
   LinkReset LinkReset[]
 
-  Groups Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  NursePrescriber      NursePrescription[]   @relation("nursePrescriber")
+  NurseExecutor        NursePrescription[]   @relation("nurseExecutor")
+  MedicalPrescriber    MedicalPrescription[] @relation("medicalPrescriber")
+  NurseExecutorMedical MedicalPrescription[] @relation("nurseExecutorMedical")
+
+  Groups      Group?        @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  NurseReport NurseReport[]
+  Doctor      Doctor?
+}
+
+model Doctor {
+  crm    String @unique
+  area   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
 }
 
 model Jwt {
@@ -75,4 +92,79 @@ model LinkReset {
   updatedAt DateTime @updatedAt @db.DateTime(0)
 
   User User @relation(fields: [idUser], references: [id], onDelete: Cascade)
+}
+
+model Patient {
+  id                  Int            @id @default(autoincrement())
+  name                String
+  lastName            String
+  addressNumber       Int?
+  cep                 String?
+  birthday            DateTime       @db.Date
+  phone               String?
+  healthInsurance     String?
+  healthInsuranceCode String?
+  cpf                 String         @unique
+  rg                  String         @unique
+  MedicalRecord       MedicalRecord?
+}
+
+model MedicalRecord {
+  id                  Int                   @id @default(autoincrement())
+  patient             Patient               @relation(fields: [patientId], references: [id])
+  patientId           Int
+  nursePrescription   NursePrescription[]
+  MedicalPrescription MedicalPrescription[]
+  NurseReport         NurseReport[]
+}
+
+model NursePrescription {
+  id               Int           @id @default(autoincrement())
+  prescription     String
+  prescriptionDate DateTime      @default(now())
+  realized         Boolean       @default(false)
+  obs              String?
+  executionDate    DateTime?
+  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId  Int
+  Prescriber       User          @relation("nursePrescriber", fields: [prescriberId], references: [id])
+  prescriberId     Int
+  Executor         User?         @relation("nurseExecutor", fields: [executorId], references: [id])
+  executorId       Int?
+  NurseReport      NurseReport?
+}
+
+model MedicalPrescription {
+  id                     Int      @id @default(autoincrement())
+  drug                   String
+  drugDosage             String
+  drugWay                String
+  administrationInterval String
+  prescriptionDate       DateTime @default(now())
+
+  realized      Boolean   @default(false)
+  obs           String?
+  executionDate DateTime?
+
+  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId Int
+  Prescriber      User          @relation("medicalPrescriber", fields: [prescriberId], references: [id])
+  prescriberId    Int
+  Executor        User?         @relation("nurseExecutorMedical", fields: [executorId], references: [id])
+  executorId      Int?
+  NurseReport     NurseReport?
+}
+
+model NurseReport {
+  id                    Int                  @id @default(autoincrement())
+  reportDate            DateTime             @default(now())
+  report                String
+  signatory             User                 @relation(fields: [signatoryId], references: [id])
+  signatoryId           Int
+  MedicalRecord         MedicalRecord        @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId       Int
+  MedicalPrescription   MedicalPrescription? @relation(fields: [medicalPrescriptionId], references: [id])
+  medicalPrescriptionId Int?
+  NursePrescription     NursePrescription?   @relation(fields: [nursePrescriptionId], references: [id])
+  nursePrescriptionId   Int?
 }
