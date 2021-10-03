@@ -18,6 +18,18 @@ class UserController {
         }
     }
 
+    async findAllByGroup(req, res) {
+        try {
+            const allUsers = await this.user.findMany({
+                where: { groupId: +req.params.id },
+                select: { email: true, groupId: true, id: true, createdAt: true },
+            });
+            return res.status(errorCodes.OK).json(allUsers);
+        } catch (error) {
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
+
     async findOne(email, isSensible) {
         if (isSensible) {
             return this.user.findFirst({
