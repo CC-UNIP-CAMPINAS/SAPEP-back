@@ -14,6 +14,7 @@ class AuthController {
             const user = await this.userController.findOneById(req.idUser, true);
             res.status(200).send({ message: "Acesso permitido.", payload: { user, auth: true } });
         } catch (error) {
+            console.log(error);
             return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
         }
     }

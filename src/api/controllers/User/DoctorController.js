@@ -46,17 +46,31 @@ class DoctorController {
             const userParams = { ...req.body };
             delete userParams["crm"];
             delete userParams["area"];
-            delete userParams["groupId"];
 
-            const user = await this.user.create({
-                data: { ...userParams, Groups: { connect: { id: 1 } }, password, Doctor: { create: doctorParams } },
-                include: { Doctor: true },
+            const user = await this.doctor.create({
+                data: { ...doctorParams, user: { create: { ...userParams, password, groupId: 1 } } },
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            email: true,
+                            gender: true,
+                            phone: true,
+                            updatedAt: true,
+                            email: true,
+                            groupId: true,
+                            id: true,
+                            createdAt: true,
+                        },
+                    },
+                },
             });
             res.status(errorCodes.CREATED).json(user);
         } catch (error) {
+            console.log(error);
             if (error.code === "P2002") {
                 return res
-                    .status(errorCodes.INTERNAL_SERVER)
+                    .status(errorCodes.CONFLICT)
                     .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Usuário já existe" });
             }
 
