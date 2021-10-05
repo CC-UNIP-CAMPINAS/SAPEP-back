@@ -7,6 +7,19 @@ class UserController {
         this.user = new PrismaService().user;
     }
 
+    userProperties = {
+        name: true,
+        email: true,
+        gender: true,
+        phone: true,
+        updatedAt: true,
+        email: true,
+        groupId: true,
+        id: true,
+        createdAt: true,
+        Doctor: true,
+    };
+
     async findAll(_, res) {
         try {
             const allUsers = await this.user.findMany({
@@ -34,7 +47,7 @@ class UserController {
         if (isSensible) {
             return this.user.findFirst({
                 where: { email },
-                select: { email: true, groupId: true, id: true, createdAt: true, Doctor: true },
+                select: this.userProperties,
             });
         } else {
             return this.user.findFirst({
@@ -48,7 +61,7 @@ class UserController {
         if (isSensible) {
             return this.user.findUnique({
                 where: { id },
-                select: { email: true, groupId: true, id: true, createdAt: true, Doctor: true },
+                select: this.userProperties,
             });
         } else {
             return this.user.findUnique({
