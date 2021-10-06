@@ -111,6 +111,25 @@ class DoctorController {
             return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
         }
     }
+
+    async delete(req, res) {
+        try {
+            await this.doctor.update({
+                where: { userId: +req.params.userId },
+                data: {
+                    active: false,
+                },
+            });
+
+            res.json({ message: "Médico desabilitado." });
+        } catch (error) {
+            if (error.code === "P2025") {
+                return res.status(errorCodes.NOT_FOUND).json({ message: "Médico não encontrado." });
+            }
+
+            return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = DoctorController;

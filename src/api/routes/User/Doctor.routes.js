@@ -38,8 +38,18 @@ module.exports = (app) => {
         }),
     };
 
+    const deleteValidation = {
+        params: Joi.object({
+            userId: Joi.number().required(),
+        }),
+    };
+
     app.patch("/user/doctor", validate(updateValidation), (req, res) => {
         doctorController.update(req, res);
+    });
+
+    app.delete("/user/doctor/:userId", validate(deleteValidation), (req, res) => {
+        doctorController.delete(req, res);
     });
 
     app.post("/user/doctor", validate(createValidation), (req, res) => {
