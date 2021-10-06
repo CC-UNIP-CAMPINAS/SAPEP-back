@@ -8,6 +8,15 @@ class DoctorController {
         this.user = new PrismaService().user;
     }
 
+    doctorProperties = {
+        area: true,
+        crm: true,
+        userId: true,
+        user: {
+            select: { email: true, gender: true, name: true, phone: true, groupId: true, updatedAt: true },
+        },
+    };
+
     async findAll(_, res) {
         try {
             const allDoctors = await this.doctor.findMany({
@@ -72,6 +81,31 @@ class DoctorController {
                 return res
                     .status(errorCodes.CONFLICT)
                     .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Usuário já existe" });
+            }
+
+            return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
+        }
+    }
+
+    async update(req, res) {
+        try {
+            const { userId } = req.body.doctorParams;
+            delete req.body.doctorParams.userId;
+            const doctor = await this.doctor.update({
+                where: { userId },
+                data: { ...req.body.doctorParams, user: { update: { ...req.body.userParams } } },
+                select: this.doctorProperties,
+            });
+            res.json({ message: "Médico atualizado.", payload: { doctor } });
+        } catch (error) {
+            console.log(error);
+            if (error.code === "P2002") {
+                return res
+                    .status(errorCodes.CONFLICT)
+                    .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Médico já existe." });
+            }
+            if (error.code === "P2025") {
+                return res.status(errorCodes.NOT_FOUND).json({ message: "Médico não encontrado." });
             }
 
             return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
