@@ -31,10 +31,11 @@ model User {
 }
 
 model Doctor {
-  crm    String @unique
+  crm    String  @unique
   area   String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int    @unique
+  active Boolean @default(true)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
 }
 
 model Jwt {
