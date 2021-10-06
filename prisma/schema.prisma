@@ -34,7 +34,7 @@ model Doctor {
   crm    String @unique
   area   String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
+  userId Int    @unique
 }
 
 model Jwt {
