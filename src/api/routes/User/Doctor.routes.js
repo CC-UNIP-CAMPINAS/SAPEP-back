@@ -38,7 +38,7 @@ module.exports = (app) => {
         }),
     };
 
-    const deleteValidation = {
+    const activationValidation = {
         params: Joi.object({
             userId: Joi.number().required(),
         }),
@@ -48,8 +48,12 @@ module.exports = (app) => {
         doctorController.update(req, res);
     });
 
-    app.delete("/user/doctor/:userId", validate(deleteValidation), (req, res) => {
-        doctorController.delete(req, res);
+    app.patch("/user/doctor/disable/:userId", validate(activationValidation), (req, res) => {
+        doctorController.disable(req, res);
+    });
+
+    app.patch("/user/doctor/enable/:userId", validate(activationValidation), (req, res) => {
+        doctorController.enable(req, res);
     });
 
     app.post("/user/doctor", validate(createValidation), (req, res) => {
