@@ -10,6 +10,7 @@
         "NursePrescription",
         "MedicalPrescription",
         "Doctor",
-        "Login"
+        "Login",
+        "Nurse"
     ]
 }
