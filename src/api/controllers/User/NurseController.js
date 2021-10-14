@@ -11,6 +11,7 @@ class NurseController {
     nurseProperties = {
         coren: true,
         userId: true,
+        active: true,
         user: {
             select: { email: true, gender: true, name: true, phone: true, groupId: true, updatedAt: true },
         },
