@@ -15,11 +15,46 @@ module.exports = (app) => {
             name: Joi.string().required(),
         }),
     };
+
+    const updateValidation = {
+        body: Joi.object({
+            userParams: Joi.object({
+                email: Joi.string().required(),
+                email: Joi.string().required(),
+                phone: Joi.string().optional(),
+                gender: Joi.string().optional(),
+                name: Joi.string().required(),
+            }).required(),
+            doctorParams: Joi.object({
+                userId: Joi.number().required(),
+                crm: Joi.string().required(),
+                area: Joi.string().required(),
+            }).required(),
+        }),
+    };
     const selectOneByCrmValidation = {
         body: Joi.object({
             crm: Joi.string().required(),
         }),
     };
+
+    const activationValidation = {
+        params: Joi.object({
+            userId: Joi.number().required(),
+        }),
+    };
+
+    app.patch("/user/doctor", validate(updateValidation), (req, res) => {
+        doctorController.update(req, res);
+    });
+
+    app.patch("/user/doctor/disable/:userId", validate(activationValidation), (req, res) => {
+        doctorController.disable(req, res);
+    });
+
+    app.patch("/user/doctor/enable/:userId", validate(activationValidation), (req, res) => {
+        doctorController.enable(req, res);
+    });
 
     app.post("/user/doctor", validate(createValidation), (req, res) => {
         doctorController.create(req, res);

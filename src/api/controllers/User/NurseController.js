@@ -2,15 +2,14 @@ const { hash } = require("bcrypt");
 const { errorCodes, statusTypes } = require("../../config/express.config");
 const PrismaService = require("../../services/prisma/prisma.service");
 
-class DoctorController {
+class NurseController {
     constructor() {
-        this.doctor = new PrismaService().doctor;
+        this.nurse = new PrismaService().nurse;
         this.user = new PrismaService().user;
     }
 
-    doctorProperties = {
-        area: true,
-        crm: true,
+    nurseProperties = {
+        coren: true,
         userId: true,
         active: true,
         user: {
@@ -20,30 +19,30 @@ class DoctorController {
 
     async findAll(_, res) {
         try {
-            const allDoctors = await this.doctor.findMany({
+            const allNurses = await this.nurse.findMany({
                 include: {
                     user: {
                         select: { updatedAt: true, email: true, gender: true, groupId: true, name: true, phone: true },
                     },
                 },
             });
-            return res.status(errorCodes.OK).json(allDoctors);
+            return res.status(errorCodes.OK).json(allNurses);
         } catch (error) {
             return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
         }
     }
 
-    async findOneByCrm(req, res) {
+    async findOneByCoren(req, res) {
         try {
-            const doctor = await this.doctor.findUnique({
-                where: { crm: req.body.crm },
+            const nurse = await this.nurse.findUnique({
+                where: { coren: req.body.coren },
                 include: {
                     user: {
                         select: { updatedAt: true, email: true, gender: true, groupId: true, name: true, phone: true },
                     },
                 },
             });
-            return res.status(errorCodes.OK).json(doctor);
+            return res.status(errorCodes.OK).json(nurse);
         } catch (error) {
             return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
         }
@@ -52,13 +51,12 @@ class DoctorController {
     async create(req, res) {
         try {
             const password = await hash(req.body.password, 12);
-            const doctorParams = { crm: req.body.crm, area: req.body.area };
+            const nurseParams = { coren: req.body.coren };
             const userParams = { ...req.body };
-            delete userParams["crm"];
-            delete userParams["area"];
+            delete userParams["coren"];
 
-            const user = await this.doctor.create({
-                data: { ...doctorParams, user: { create: { ...userParams, password, groupId: 1 } } },
+            const user = await this.nurse.create({
+                data: { ...nurseParams, user: { create: { ...userParams, password, groupId: 2 } } },
                 include: {
                     user: {
                         select: {
@@ -90,23 +88,23 @@ class DoctorController {
 
     async update(req, res) {
         try {
-            const { userId } = req.body.doctorParams;
-            delete req.body.doctorParams.userId;
-            const doctor = await this.doctor.update({
+            const { userId } = req.body.nurseParams;
+            delete req.body.nurseParams.userId;
+            const nurse = await this.nurse.update({
                 where: { userId },
-                data: { ...req.body.doctorParams, user: { update: { ...req.body.userParams } } },
-                select: this.doctorProperties,
+                data: { ...req.body.nurseParams, user: { update: { ...req.body.userParams } } },
+                select: this.nurseProperties,
             });
-            res.json({ message: "Médico atualizado.", payload: { doctor } });
+            res.json({ message: "Enfermeiro atualizado.", payload: { nurse } });
         } catch (error) {
             console.log(error);
             if (error.code === "P2002") {
                 return res
                     .status(errorCodes.CONFLICT)
-                    .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Médico já existe." });
+                    .json({ status: statusTypes.UNIQUE_VIOLATION, message: "Enfermeiro já existe." });
             }
             if (error.code === "P2025") {
-                return res.status(errorCodes.NOT_FOUND).json({ message: "Médico não encontrado." });
+                return res.status(errorCodes.NOT_FOUND).json({ message: "Enfermeiro não encontrado." });
             }
 
             return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
@@ -115,17 +113,17 @@ class DoctorController {
 
     async disable(req, res) {
         try {
-            await this.doctor.update({
+            await this.nurse.update({
                 where: { userId: +req.params.userId },
                 data: {
                     active: false,
                 },
             });
 
-            res.json({ message: "Médico desabilitado." });
+            res.json({ message: "Enfermeiro desabilitado." });
         } catch (error) {
             if (error.code === "P2025") {
-                return res.status(errorCodes.NOT_FOUND).json({ message: "Médico não encontrado." });
+                return res.status(errorCodes.NOT_FOUND).json({ message: "Enfermeiro não encontrado." });
             }
 
             return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
@@ -134,17 +132,17 @@ class DoctorController {
 
     async enable(req, res) {
         try {
-            await this.doctor.update({
+            await this.nurse.update({
                 where: { userId: +req.params.userId },
                 data: {
                     active: true,
                 },
             });
 
-            res.json({ message: "Médico habilitado." });
+            res.json({ message: "Enfermeiro habilitado." });
         } catch (error) {
             if (error.code === "P2025") {
-                return res.status(errorCodes.NOT_FOUND).json({ message: "Médico não encontrado." });
+                return res.status(errorCodes.NOT_FOUND).json({ message: "Enfermeiro não encontrado." });
             }
 
             return res.status(errorCodes.INTERNAL_SERVER).json({ message: error.message });
@@ -152,4 +150,4 @@ class DoctorController {
     }
 }
 
-module.exports = DoctorController;
+module.exports = NurseController;

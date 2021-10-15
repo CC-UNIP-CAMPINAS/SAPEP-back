@@ -28,13 +28,22 @@ model User {
   Groups      Group?        @relation(fields: [groupId], references: [id], onDelete: SetNull)
   NurseReport NurseReport[]
   Doctor      Doctor?
+  Nurse       Nurse?
 }
 
 model Doctor {
-  crm    String @unique
+  crm    String  @unique
   area   String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
+  active Boolean @default(true)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
+}
+
+model Nurse {
+  coren  String  @unique
+  active Boolean @default(true)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
 }
 
 model Jwt {
@@ -112,7 +121,7 @@ model Patient {
 model MedicalRecord {
   id                  Int                   @id @default(autoincrement())
   patient             Patient               @relation(fields: [patientId], references: [id])
-  patientId           Int
+  patientId           Int                   @unique
   nursePrescription   NursePrescription[]
   MedicalPrescription MedicalPrescription[]
   NurseReport         NurseReport[]
@@ -164,7 +173,7 @@ model NurseReport {
   MedicalRecord         MedicalRecord        @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId       Int
   MedicalPrescription   MedicalPrescription? @relation(fields: [medicalPrescriptionId], references: [id])
-  medicalPrescriptionId Int?
+  medicalPrescriptionId Int?                 @unique
   NursePrescription     NursePrescription?   @relation(fields: [nursePrescriptionId], references: [id])
-  nursePrescriptionId   Int?
+  nursePrescriptionId   Int?                 @unique
 }
