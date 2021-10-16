@@ -1,24 +1,37 @@
 const UserController = require("../../controllers/User/UserController");
 const { validate, Joi } = require("express-validation");
+const { verifyJWT, verifyGroup } = require("../../middlewares/auth.middleware");
 
 const userController = new UserController();
 
 module.exports = (app) => {
-    const getByGroupValidation = {
-        params: Joi.object({
-            id: Joi.number().required(),
-        }),
-    };
+  const getByGroupValidation = {
+    params: Joi.object({
+      id: Joi.number().required(),
+    }),
+  };
 
-    app.route("/user")
-        .get((req, res) => {
-            userController.findAll(req, res);
-        })
-        .post((req, res) => {
-            userController.create(req, res);
-        });
+  app.get(
+    "/user",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      userController.findAll(req, res);
+    }
+  );
 
-    app.get("/user/group/:id", validate(getByGroupValidation), (req, res) => {
-        userController.findAllByGroup(req, res);
-    });
+  app.post(
+    "/user",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      userController.create(req, res);
+    }
+  );
+
+  app.get(
+    "/user/group/:id",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      userController.findAllByGroup(req, res);
+    }
+  );
 };
