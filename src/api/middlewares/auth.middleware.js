@@ -4,6 +4,9 @@ const JwtController = require("../controllers/JwtController");
 
 const jwtController = new JwtController();
 
+const UserController = require("../controllers/User/UserController");
+const userController = new UserController();
+
 /**
  *
  *Middleware para validação de um token JWT
@@ -22,6 +25,8 @@ async function verifyJWT(req, res, next) {
 
         if (result) {
             req.idUser = jwtObject.idUser;
+            const group = await userController.findGroupByUserId(req.idUser);
+            req.group = group.Groups.name;
             next();
         } else {
             res.clearCookie("sapep_token");
@@ -34,4 +39,18 @@ async function verifyJWT(req, res, next) {
     }
 }
 
-module.exports = { verifyJWT };
+
+async function verifyGroup(req, res, next, allowedGroups) {
+    const permission = allowedGroups.includes(req.group)
+
+    if (permission) {
+        next();
+    }
+    else {
+        return res
+            .status(errorCodes.NOT_AUTHORIZED)
+            .send({ status: statusTypes.NOT_AUTHORIZED, message: "Usuário sem permissão do recurso." });
+    }
+}
+
+module.exports = { verifyJWT, verifyGroup };

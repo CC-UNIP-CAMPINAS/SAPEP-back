@@ -1,5 +1,6 @@
 const NurseController = require("../../controllers/User/NurseController");
 const { validate, Joi } = require("express-validation");
+const { verifyJWT, verifyGroup } = require("../../middlewares/auth.middleware");
 
 const nurseController = new NurseController();
 
@@ -41,27 +42,27 @@ module.exports = (app) => {
         }),
     };
 
-    app.patch("/user/nurse", validate(updateValidation), (req, res) => {
+    app.patch("/user/nurse", [validate(updateValidation), verifyJWT, (req, res, next) => verifyGroup(req, res, next, ['ROOT'])], (req, res) => {
         nurseController.update(req, res);
     });
 
-    app.patch("/user/nurse/disable/:userId", validate(activationValidation), (req, res) => {
+    app.patch("/user/nurse/disable/:userId", [validate(activationValidation), verifyJWT, (req, res, next) => verifyGroup(req, res, next, ['ROOT'])], (req, res) => {
         nurseController.disable(req, res);
     });
 
-    app.patch("/user/nurse/enable/:userId", validate(activationValidation), (req, res) => {
+    app.patch("/user/nurse/enable/:userId", [validate(activationValidation), verifyJWT, (req, res, next) => verifyGroup(req, res, next, ['ROOT'])], (req, res) => {
         nurseController.enable(req, res);
     });
 
-    app.post("/user/nurse", validate(createValidation), (req, res) => {
+    app.post("/user/nurse", [validate(createValidation), verifyJWT, (req, res, next) => verifyGroup(req, res, next, ['ROOT'])], (req, res) => {
         nurseController.create(req, res);
     });
-
-    app.get("/user/nurse", (req, res) => {
+ 
+    app.get("/user/nurse", [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ['ROOT'])], (req, res) => {
         nurseController.findAll(req, res);
     });
 
-    app.get("/user/nurse/coren", validate(selectOneByCorenValidation), (req, res) => {
+    app.get("/user/nurse/coren", [validate(selectOneByCorenValidation), verifyJWT, (req, res, next) => verifyGroup(req, res, next, ['ROOT'])], (req, res) => {
         nurseController.findOneByCoren(req, res);
     });
 };

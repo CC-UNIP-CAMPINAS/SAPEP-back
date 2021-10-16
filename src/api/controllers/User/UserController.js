@@ -90,6 +90,17 @@ class UserController {
         delete user.password;
         return user;
     }
+
+    async findGroupByUserId(userId){
+        return this.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                Groups: true
+            }
+        })
+    }
 }
 
 module.exports = UserController;
