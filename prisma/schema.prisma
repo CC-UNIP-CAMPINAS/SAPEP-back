@@ -20,30 +20,9 @@ model User {
   Jwts      Jwt[]
   LinkReset LinkReset[]
 
-  NursePrescriber      NursePrescription[]   @relation("nursePrescriber")
-  NurseExecutor        NursePrescription[]   @relation("nurseExecutor")
-  MedicalPrescriber    MedicalPrescription[] @relation("medicalPrescriber")
-  NurseExecutorMedical MedicalPrescription[] @relation("nurseExecutorMedical")
-
-  Groups      Group?        @relation(fields: [groupId], references: [id], onDelete: SetNull)
-  NurseReport NurseReport[]
-  Doctor      Doctor?
-  Nurse       Nurse?
-}
-
-model Doctor {
-  crm    String  @unique
-  area   String
-  active Boolean @default(true)
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int     @unique
-}
-
-model Nurse {
-  coren  String  @unique
-  active Boolean @default(true)
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int     @unique
+  Groups Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  Doctor Doctor?
+  Nurse  Nurse?
 }
 
 model Jwt {
@@ -118,29 +97,14 @@ model Patient {
   MedicalRecord       MedicalRecord?
 }
 
-model MedicalRecord {
-  id                  Int                   @id @default(autoincrement())
-  patient             Patient               @relation(fields: [patientId], references: [id])
-  patientId           Int                   @unique
-  nursePrescription   NursePrescription[]
-  MedicalPrescription MedicalPrescription[]
-  NurseReport         NurseReport[]
-}
+model Doctor {
+  crm    String  @unique
+  area   String
+  active Boolean @default(true)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
 
-model NursePrescription {
-  id               Int           @id @default(autoincrement())
-  prescription     String
-  prescriptionDate DateTime      @default(now())
-  realized         Boolean       @default(false)
-  obs              String?
-  executionDate    DateTime?
-  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
-  medicalRecordId  Int
-  Prescriber       User          @relation("nursePrescriber", fields: [prescriberId], references: [id])
-  prescriberId     Int
-  Executor         User?         @relation("nurseExecutor", fields: [executorId], references: [id])
-  executorId       Int?
-  NurseReport      NurseReport?
+  MedicalPrescriber MedicalPrescription[] @relation("medicalPrescriber")
 }
 
 model MedicalPrescription {
@@ -157,18 +121,55 @@ model MedicalPrescription {
 
   MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId Int
-  Prescriber      User          @relation("medicalPrescriber", fields: [prescriberId], references: [id])
+  Prescriber      Doctor        @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
   prescriberId    Int
-  Executor        User?         @relation("nurseExecutorMedical", fields: [executorId], references: [id])
+  Executor        Nurse?        @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
   executorId      Int?
   NurseReport     NurseReport?
+}
+
+model MedicalRecord {
+  id                  Int                   @id @default(autoincrement())
+  patient             Patient               @relation(fields: [patientId], references: [id])
+  patientId           Int                   @unique
+  nursePrescription   NursePrescription[]
+  MedicalPrescription MedicalPrescription[]
+  NurseReport         NurseReport[]
+}
+
+model Nurse {
+  coren       String        @unique
+  active      Boolean       @default(true)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int           @unique
+  NurseReport NurseReport[]
+
+  NursePrescriber      NursePrescription[]   @relation("nursePrescriber")
+  NurseExecutor        NursePrescription[]   @relation("nurseExecutor")
+  NurseExecutorMedical MedicalPrescription[] @relation("nurseExecutorMedical")
+}
+
+model NursePrescription {
+  id               Int           @id @default(autoincrement())
+  prescription     String
+  prescriptionDate DateTime      @default(now())
+  realized         Boolean       @default(false)
+  obs              String?
+  executionDate    DateTime?
+  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId  Int
+  Prescriber       Nurse         @relation("nursePrescriber", fields: [prescriberId], references: [userId])
+  prescriberId     Int
+  Executor         Nurse?        @relation("nurseExecutor", fields: [executorId], references: [userId])
+  executorId       Int?
+  NurseReport      NurseReport?
 }
 
 model NurseReport {
   id                    Int                  @id @default(autoincrement())
   reportDate            DateTime             @default(now())
   report                String
-  signatory             User                 @relation(fields: [signatoryId], references: [id])
+  signatory             Nurse                @relation(fields: [signatoryId], references: [userId])
   signatoryId           Int
   MedicalRecord         MedicalRecord        @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId       Int
