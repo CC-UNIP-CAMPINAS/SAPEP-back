@@ -86,6 +86,7 @@ model Patient {
   id                  Int            @id @default(autoincrement())
   name                String
   lastName            String
+  gender              String         @default("INDEFINIDO")
   addressNumber       Int?
   cep                 String?
   birthday            DateTime       @db.Date
