@@ -1,16 +1,17 @@
 {
-    "conventionalCommits.scopes": [
-        "JWT",
-        "Prisma",
-        "Auth",
-        "Express",
-        "User",
-        "Group",
-        "Patient",
-        "NursePrescription",
-        "MedicalPrescription",
-        "Doctor",
-        "Login",
-        "Nurse"
-    ]
+  "conventionalCommits.scopes": [
+    "JWT",
+    "Prisma",
+    "Auth",
+    "Express",
+    "User",
+    "Group",
+    "Patient",
+    "NursePrescription",
+    "MedicalPrescription",
+    "Doctor",
+    "Login",
+    "Nurse",
+    "Adm"
+  ]
 }

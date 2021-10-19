@@ -1,14 +1,12 @@
-const DoctorController = require("../../controllers/User/DoctorController");
+const AdmController = require("../../controllers/User/AdmController");
 const { validate, Joi } = require("express-validation");
 const { verifyJWT, verifyGroup } = require("../../middlewares/auth.middleware");
 
-const doctorController = new DoctorController();
+const admController = new AdmController();
 
 module.exports = (app) => {
   const createValidation = {
     body: Joi.object({
-      crm: Joi.string().required(),
-      area: Joi.string().required(),
       email: Joi.string().required(),
       password: Joi.string().required(),
       phone: Joi.string().optional(),
@@ -25,16 +23,9 @@ module.exports = (app) => {
         gender: Joi.string().optional(),
         name: Joi.string().required(),
       }).required(),
-      doctorParams: Joi.object({
+      admParams: Joi.object({
         userId: Joi.number().required(),
-        crm: Joi.string().required(),
-        area: Joi.string().required(),
       }).required(),
-    }),
-  };
-  const selectOneByCrmValidation = {
-    body: Joi.object({
-      crm: Joi.string().required(),
     }),
   };
 
@@ -45,70 +36,58 @@ module.exports = (app) => {
   };
 
   app.patch(
-    "/user/doctor",
+    "/user/adm",
     [
       validate(updateValidation),
       verifyJWT,
       (req, res, next) => verifyGroup(req, res, next, ["ROOT"]),
     ],
     (req, res) => {
-      doctorController.update(req, res);
+      admController.update(req, res);
     }
   );
 
   app.patch(
-    "/user/doctor/disable/:userId",
+    "/user/adm/disable/:userId",
     [
       validate(activationValidation),
       verifyJWT,
       (req, res, next) => verifyGroup(req, res, next, ["ROOT"]),
     ],
     (req, res) => {
-      doctorController.disable(req, res);
+      admController.disable(req, res);
     }
   );
 
   app.patch(
-    "/user/doctor/enable/:userId",
+    "/user/adm/enable/:userId",
     [
       validate(activationValidation),
       verifyJWT,
       (req, res, next) => verifyGroup(req, res, next, ["ROOT"]),
     ],
     (req, res) => {
-      doctorController.enable(req, res);
+      admController.enable(req, res);
     }
   );
 
   app.post(
-    "/user/doctor",
+    "/user/adm",
     [
       validate(createValidation),
       verifyJWT,
       (req, res, next) => verifyGroup(req, res, next, ["ROOT"]),
     ],
     (req, res) => {
-      doctorController.create(req, res);
+      admController.create(req, res);
     }
   );
 
   app.get(
-    "/user/doctor",
+    "/user/adm",
     [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
     (req, res) => {
-      doctorController.findAll(req, res);
-    }
-  );
-
-  app.get(
-    "/user/doctor/crm",
-    [
-      validate(selectOneByCrmValidation),
-      verifyJWT,
-      (req, res, next) => verifyGroup(req, res, next, ["ROOT"]),
-    ],
-    (req, res) => {
-      doctorController.findOneByCrm(req, res);
+      admController.findAll(req, res);
     }
   );
 };

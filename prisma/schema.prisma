@@ -23,6 +23,7 @@ model User {
   Groups Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
   Doctor Doctor?
   Nurse  Nurse?
+  Adm    Adm[]
 }
 
 model Jwt {
@@ -106,6 +107,12 @@ model Doctor {
   userId Int     @unique
 
   MedicalPrescriber MedicalPrescription[] @relation("medicalPrescriber")
+}
+
+model Adm {
+  active Boolean @default(true)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
 }
 
 model MedicalPrescription {
