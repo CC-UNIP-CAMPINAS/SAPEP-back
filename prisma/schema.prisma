@@ -84,19 +84,19 @@ model LinkReset {
 }
 
 model Patient {
-  id                  Int            @id @default(autoincrement())
-  name                String
-  lastName            String
-  gender              String         @default("INDEFINIDO")
-  addressNumber       Int?
-  cep                 String?
-  birthday            DateTime       @db.Date
-  phone               String?
-  healthInsurance     String?
-  healthInsuranceCode String?
-  cpf                 String         @unique
-  rg                  String         @unique
-  MedicalRecord       MedicalRecord?
+  id              Int            @id @default(autoincrement())
+  name            String
+  lastName        String
+  gender          String         @default("INDEFINIDO")
+  addressNumber   Int?
+  cep             String?
+  complement      String?
+  birthday        DateTime       @db.Date
+  phone           String?
+  healthInsurance String?
+  cpf             String         @unique
+  rg              String         @unique
+  MedicalRecord   MedicalRecord?
 }
 
 model Doctor {
