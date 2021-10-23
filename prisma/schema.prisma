@@ -88,7 +88,7 @@ model Patient {
   name            String
   lastName        String
   gender          String         @default("INDEFINIDO")
-  addressNumber   Int?
+  addressNumber   String?        @default("S/N")
   cep             String?
   complement      String?
   birthday        DateTime       @db.Date
