@@ -2,22 +2,38 @@ const PatientController = require("../controllers/PatientController");
 
 const patientController = new PatientController();
 
-module.exports = (app) => {
-    app.route("/patient")
-        .get((req, res) => {
-            patientController.findAll(req, res);
-        })
-        .patch((req, res) => {
-            patientController.update(req, res);
-        })
-        .post((req, res) => {
-            patientController.create(req, res);
-        });
+const { verifyJWT, verifyGroup } = require("../middlewares/auth.middleware");
 
-    app.get("/patient/:id", (req, res) => {
-        patientController.findOneById(req, res);
-    });
-    app.delete("/patient/:id", (req, res) => {
-        patientController.delete(req, res);
-    });
+module.exports = (app) => {
+  app.get(
+    "/patient/:id",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      patientController.findOneById(req, res);
+    }
+  );
+
+  app.get(
+    "/patient",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      patientController.findAll(req, res);
+    }
+  );
+
+  app.post(
+    "/patient",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      patientController.create(req, res);
+    }
+  );
+
+  app.delete(
+    "/patient/:id",
+    [verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ROOT"])],
+    (req, res) => {
+      patientController.delete(req, res);
+    }
+  );
 };
