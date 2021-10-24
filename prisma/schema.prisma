@@ -121,19 +121,17 @@ model MedicalPrescription {
   drugDosage             String
   drugWay                String
   administrationInterval String
+  administrationCount    Int
   prescriptionDate       DateTime @default(now())
 
-  realized      Boolean   @default(false)
-  obs           String?
-  executionDate DateTime?
+  realized Boolean @default(false)
+  obs      String?
 
-  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  MedicalRecord   MedicalRecord                  @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId Int
-  Prescriber      Doctor        @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
+  Prescriber      Doctor                         @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
   prescriberId    Int
-  Executor        Nurse?        @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
-  executorId      Int?
-  NurseReport     NurseReport?
+  Executors       ExecutorsMedicalPrescription[]
 }
 
 model MedicalRecord {
@@ -152,9 +150,9 @@ model Nurse {
   userId      Int           @unique
   NurseReport NurseReport[]
 
-  NursePrescriber      NursePrescription[]   @relation("nursePrescriber")
-  NurseExecutor        NursePrescription[]   @relation("nurseExecutor")
-  NurseExecutorMedical MedicalPrescription[] @relation("nurseExecutorMedical")
+  NursePrescriber      NursePrescription[]            @relation("nursePrescriber")
+  NurseExecutor        NursePrescription[]            @relation("nurseExecutor")
+  NurseExecutorMedical ExecutorsMedicalPrescription[] @relation("nurseExecutorMedical")
 }
 
 model NursePrescription {
@@ -174,15 +172,25 @@ model NursePrescription {
 }
 
 model NurseReport {
+  id                             Int                           @id @default(autoincrement())
+  reportDate                     DateTime                      @default(now())
+  report                         String
+  signatory                      Nurse                         @relation(fields: [signatoryId], references: [userId])
+  signatoryId                    Int
+  MedicalRecord                  MedicalRecord                 @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId                Int
+  MedicalPrescription            ExecutorsMedicalPrescription? @relation(fields: [executorsMedicalPrescriptionId], references: [id])
+  executorsMedicalPrescriptionId Int?                          @unique
+  NursePrescription              NursePrescription?            @relation(fields: [nursePrescriptionId], references: [id])
+  nursePrescriptionId            Int?                          @unique
+}
+
+model ExecutorsMedicalPrescription {
   id                    Int                  @id @default(autoincrement())
-  reportDate            DateTime             @default(now())
-  report                String
-  signatory             Nurse                @relation(fields: [signatoryId], references: [userId])
-  signatoryId           Int
-  MedicalRecord         MedicalRecord        @relation(fields: [medicalRecordId], references: [id])
-  medicalRecordId       Int
   MedicalPrescription   MedicalPrescription? @relation(fields: [medicalPrescriptionId], references: [id])
   medicalPrescriptionId Int?                 @unique
-  NursePrescription     NursePrescription?   @relation(fields: [nursePrescriptionId], references: [id])
-  nursePrescriptionId   Int?                 @unique
+  Executor              Nurse?               @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
+  executorId            Int?
+  executionDate         DateTime             @default(now()) @db.DateTime(0)
+  NurseReport           NurseReport?
 }

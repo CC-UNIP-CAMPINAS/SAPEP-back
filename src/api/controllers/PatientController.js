@@ -1,6 +1,51 @@
+const { transformDocument } = require("@prisma/client/runtime");
 const cep = require("cep-promise");
 const { errorCodes, statusTypes } = require("../config/express.config");
 const PrismaService = require("../services/prisma/prisma.service");
+
+const include = {
+  include: {
+    MedicalRecord: {
+      include: {
+        MedicalPrescription: {
+          select: {
+            Executors: {
+              select: {
+                executionDate: true,
+                Executor: {
+                  select: {
+                    user: {
+                      select: {
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            Prescriber: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+            prescriptionDate: true,
+            drug: true,
+            drugDosage: true,
+            drugWay: true,
+            administrationInterval: true,
+            administrationCount: true,
+            realized: true,
+            obs: true,
+          },
+        },
+      },
+    },
+  },
+};
 
 class PatientController {
   constructor() {
@@ -9,7 +54,9 @@ class PatientController {
 
   async findAll(_, res) {
     try {
-      const allPatients = await this.patient.findMany();
+      const allPatients = await this.patient.findMany({
+        ...include,
+      });
 
       for (const patient of allPatients) {
         if (patient.cep) {
@@ -34,7 +81,23 @@ class PatientController {
         //NOTE ou envia vazio e da erro, ou envia algo que não é número
         const patient = await this.patient.findUnique({
           where: { id: +req.params.id },
+          ...include,
         });
+        patient.MedicalRecord = {
+          MedicalPrescription: patient.MedicalRecord.MedicalPrescription.map(
+            (item) => {
+              return {
+                ...item,
+                Executors: item.Executors.map((executor) => {
+                  return {
+                    executionDate: executor.executionDate,
+                    executor: executor.Executor.user.name,
+                  };
+                }),
+              };
+            }
+          ),
+        };
         if (patient) {
           if (patient.cep) {
             const address = await cep(patient.cep);
@@ -63,7 +126,9 @@ class PatientController {
       const patient = await this.patient.create({
         data: {
           ...req.body,
+          MedicalRecord: { create: {} },
         },
+        ...include,
       });
       return res.status(errorCodes.CREATED).json(patient);
     } catch (error) {
