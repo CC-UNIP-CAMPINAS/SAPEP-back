@@ -41,7 +41,17 @@ const include = {
                         obs: true,
                     },
                 },
-                NursePrescription: true,
+                NursePrescription: {
+                    select: {
+                        executionDate: true,
+                        obs: true,
+                        prescription: true,
+                        realized: true,
+                        prescriptionDate: true,
+                        Executor: { select: { user: { select: { name: true } } } },
+                        Prescriber: { select: { user: { select: { name: true } } } },
+                    },
+                },
                 TeamReport: {
                     select: { report: true, signatory: { select: { name: true } }, reportDate: true },
                 },
