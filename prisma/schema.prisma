@@ -20,10 +20,11 @@ model User {
   Jwts      Jwt[]
   LinkReset LinkReset[]
 
-  Groups Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
-  Doctor Doctor?
-  Nurse  Nurse?
-  Adm    Adm[]
+  Groups     Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  Doctor     Doctor?
+  Nurse      Nurse?
+  Adm        Adm?
+  TeamReport TeamReport[]
 }
 
 model Jwt {
@@ -92,8 +93,8 @@ model Patient {
   cep             String?
   complement      String?
   birthday        DateTime       @db.Date
-  phone           String?
-  healthInsurance String?
+  phone           String?        @default("NÃO CONSTA")
+  healthInsurance String?        @default("NÃO CONSTA")
   cpf             String         @unique
   rg              String         @unique
   MedicalRecord   MedicalRecord?
@@ -138,9 +139,20 @@ model MedicalRecord {
   id                  Int                   @id @default(autoincrement())
   patient             Patient               @relation(fields: [patientId], references: [id])
   patientId           Int                   @unique
-  nursePrescription   NursePrescription[]
+  NursePrescription   NursePrescription[]
   MedicalPrescription MedicalPrescription[]
   NurseReport         NurseReport[]
+  TeamReport          TeamReport[]
+}
+
+model TeamReport {
+  id              Int            @id @default(autoincrement())
+  reportDate      DateTime       @default(now())
+  report          String
+  signatory       User           @relation(fields: [userId], references: [id])
+  userId          Int
+  MedicalRecord   MedicalRecord? @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId Int
 }
 
 model Nurse {
