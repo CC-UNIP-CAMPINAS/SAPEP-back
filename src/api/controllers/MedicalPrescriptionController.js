@@ -41,7 +41,40 @@ class MedicalPrescriptionController {
                 data: {
                     ...req.body,
                     medicalRecordId: +req.body.medicalRecordId,
-                    prescriberId: +req.body.prescriberId,
+                    prescriberId: req.idUser,
+                },
+                select: {
+                    Executors: {
+                        select: {
+                            executionDate: true,
+                            Executor: {
+                                select: {
+                                    user: {
+                                        select: {
+                                            name: true,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    Prescriber: {
+                        select: {
+                            user: {
+                                select: {
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                    prescriptionDate: true,
+                    drug: true,
+                    drugDosage: true,
+                    drugWay: true,
+                    administrationInterval: true,
+                    administrationCount: true,
+                    realized: true,
+                    obs: true,
                 },
             });
             res.json(medicalPrescription);
