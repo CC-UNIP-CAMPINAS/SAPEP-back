@@ -12,6 +12,7 @@
     "Doctor",
     "Login",
     "Nurse",
-    "Adm"
+    "Adm",
+    "TeamReport"
   ]
 }
