@@ -72,10 +72,11 @@ class PatientController {
         this.patient = new PrismaService().patient;
     }
 
-    async findAll(_, res) {
+    async findAll(req, res) {
+        const includeTemp = ["ADM", "ROOT"].includes(req.group) ? {} : include;
         try {
             const allPatients = await this.patient.findMany({
-                ...include,
+                ...includeTemp,
             });
 
             for (const patient of allPatients) {
@@ -84,6 +85,8 @@ class PatientController {
                     patient.address = `${address.street}, ${patient.addressNumber} - ${address.neighborhood}, ${
                         address.city
                     } - ${address.state}${patient.complement ? ` - Complemento: ${patient.complement}` : ""}`;
+                } else {
+                    patient.address = "NÃO CONSTA";
                 }
             }
 
@@ -95,11 +98,12 @@ class PatientController {
 
     async findOneById(req, res) {
         try {
+            const includeTemp = ["ADM", "ROOT"].includes(req.group) ? {} : include;
             if (Number.isInteger(+req.params.id)) {
                 //NOTE ou envia vazio e da erro, ou envia algo que não é número
                 const patient = await this.patient.findUnique({
                     where: { id: +req.params.id },
-                    ...include,
+                    ...includeTemp,
                 });
 
                 if (patient) {
@@ -123,13 +127,24 @@ class PatientController {
 
     async create(req, res) {
         try {
+            const includeTemp = ["ADM", "ROOT"].includes(req.group) ? {} : include;
             const patient = await this.patient.create({
                 data: {
                     ...req.body,
                     MedicalRecord: { create: {} },
                 },
-                ...include,
+                ...includeTemp,
             });
+
+            if (patient.cep) {
+                const address = await cep(patient.cep);
+                patient.address = `${address.street}, ${patient.addressNumber} - ${address.neighborhood}, ${
+                    address.city
+                } - ${address.state}${patient.complement ? ` - Complemento: ${patient.complement}` : ""}`;
+            } else {
+                patient.address = "NÃO CONSTA";
+            }
+
             return res.status(errorCodes.CREATED).json(patient);
         } catch (error) {
             if (error.code === "P2002") {
@@ -172,11 +187,20 @@ class PatientController {
                 },
             });
 
+            if (patient.cep) {
+                const address = await cep(patient.cep);
+                patient.address = `${address.street}, ${patient.addressNumber} - ${address.neighborhood}, ${
+                    address.city
+                } - ${address.state}${patient.complement ? ` - Complemento: ${patient.complement}` : ""}`;
+            } else {
+                patient.address = "NÃO CONSTA";
+            }
+
             return res.status(errorCodes.OK).json(patient);
         } catch (error) {
             console.log(error);
             if (error.code === "P2002") {
-                return res.status(errorCodes.INTERNAL_SERVER).json({
+                return res.status(errorCodes.CONFLICT).json({
                     status: statusTypes.UNIQUE_VIOLATION,
                     message: "Paciente já existe.",
                 });
@@ -188,8 +212,8 @@ class PatientController {
         }
     }
 
-    async getAddressByCep(cepA) {
-        cep(cepA)
+    async getAddressByCep(cep) {
+        cep(cep)
             .then((result) => {
                 return result;
             })
