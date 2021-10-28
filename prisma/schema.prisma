@@ -91,7 +91,7 @@ model Patient {
   gender          String         @default("INDEFINIDO")
   addressNumber   String?        @default("S/N")
   cep             String?
-  complement      String?
+  complement      String?        @default("NÃO CONSTA")
   birthday        DateTime       @db.Date
   phone           String?        @default("NÃO CONSTA")
   healthInsurance String?        @default("NÃO CONSTA")
