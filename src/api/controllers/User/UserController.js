@@ -18,6 +18,7 @@ class UserController {
         id: true,
         createdAt: true,
         Doctor: true,
+        Nurse: true,
     };
 
     async findAll(_, res) {
@@ -91,15 +92,15 @@ class UserController {
         return user;
     }
 
-    async findGroupByUserId(userId){
+    async findGroupByUserId(userId) {
         return this.user.findUnique({
             where: {
-                id: userId
+                id: userId,
             },
             select: {
-                Groups: true
-            }
-        })
+                Groups: true,
+            },
+        });
     }
 }
 
