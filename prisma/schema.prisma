@@ -8,23 +8,24 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  email     String      @unique
-  password  String
-  groupId   Int?
-  createdAt DateTime    @default(now()) @db.DateTime(0)
-  updatedAt DateTime    @updatedAt @db.DateTime(0)
-  phone     String?
-  gender    String      @default("INDEFINIDO")
-  name      String
-  Jwts      Jwt[]
-  LinkReset LinkReset[]
-
-  Groups     Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
-  Doctor     Doctor?
-  Nurse      Nurse?
+  id         Int          @id @default(autoincrement())
+  email      String       @unique
+  password   String
+  createdAt  DateTime     @default(now()) @db.DateTime(0)
+  updatedAt  DateTime     @default(now()) @updatedAt @db.DateTime(0)
+  groupId    Int?
+  phone      String?
+  gender     String       @default("INDEFINIDO")
+  name       String
+  Groups     Group?       @relation(fields: [groupId], references: [id])
   Adm        Adm?
+  Doctor     Doctor?
+  Jwts       Jwt?
+  LinkReset  LinkReset[]
+  Nurse      Nurse?
   TeamReport TeamReport[]
+
+  @@index([groupId], map: "User_groupId_fkey")
 }
 
 model Jwt {
@@ -34,137 +35,135 @@ model Jwt {
   idUser    Int      @unique
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)
-
-  User User @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
 
   @@index([idUser])
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
-
+  id              Int               @id @default(autoincrement())
+  createdAt       DateTime          @default(now()) @db.DateTime(0)
+  updatedAt       DateTime          @updatedAt @db.DateTime(0)
+  name            String            @unique @db.VarChar(255)
   groupPermission GroupPermission[]
   User            User[]
 }
 
 model Permission {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
-
+  id              Int               @id @default(autoincrement())
+  name            String
+  createdAt       DateTime          @default(now()) @db.DateTime(0)
+  updatedAt       DateTime          @updatedAt @db.DateTime(0)
   groupPermission GroupPermission[]
 }
 
 model GroupPermission {
-  group        Group      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   groupId      Int
-  permission   Permission @relation(fields: [groupId], references: [id], onDelete: Cascade)
   permissionId Int
-
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
+  createdAt    DateTime   @default(now()) @db.DateTime(0)
+  updatedAt    DateTime   @updatedAt @db.DateTime(0)
+  permission   Permission @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  group        Group      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([groupId, permissionId])
+  @@index([permissionId], map: "GroupPermission_permissionId_fkey")
 }
 
 model LinkReset {
-  id     Int      @id @default(autoincrement())
-  link   String   @db.VarChar(255)
-  expire DateTime @db.DateTime(0)
-  idUser Int
-
+  id        Int      @id @default(autoincrement())
+  link      String   @db.VarChar(255)
+  expire    DateTime @db.DateTime(0)
+  idUser    Int
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)
+  User      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
 
-  User User @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  @@index([idUser], map: "LinkReset_idUser_fkey")
 }
 
 model Patient {
   id              Int            @id @default(autoincrement())
   name            String
   lastName        String
-  gender          String         @default("INDEFINIDO")
   addressNumber   String?        @default("S/N")
   cep             String?
-  complement      String?        @default("NÃO CONSTA")
   birthday        DateTime       @db.Date
   phone           String?        @default("NÃO CONSTA")
   healthInsurance String?        @default("NÃO CONSTA")
   cpf             String         @unique
   rg              String         @unique
+  gender          String         @default("INDEFINIDO")
+  complement      String?        @default("NÃO CONSTA")
   MedicalRecord   MedicalRecord?
 }
 
 model Doctor {
-  crm    String  @unique
-  area   String
-  active Boolean @default(true)
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int     @unique
-
+  crm               String                @unique
+  area              String
+  userId            Int                   @unique
+  active            Boolean               @default(true)
+  user              User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   MedicalPrescriber MedicalPrescription[] @relation("medicalPrescriber")
 }
 
 model Adm {
+  userId Int     @unique
   active Boolean @default(true)
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int     @unique
 }
 
 model MedicalPrescription {
-  id                     Int      @id @default(autoincrement())
+  id                     Int                           @id @default(autoincrement())
   drug                   String
   drugDosage             String
   drugWay                String
   administrationInterval String
+  prescriptionDate       DateTime                      @default(now())
+  realized               Boolean                       @default(false)
+  obs                    String?
+  medicalRecordId        Int
+  prescriberId           Int
   administrationCount    Int
-  prescriptionDate       DateTime @default(now())
+  MedicalRecord          MedicalRecord                 @relation(fields: [medicalRecordId], references: [id])
+  Prescriber             Doctor                        @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
+  Executors              ExecutorsMedicalPrescription?
 
-  realized Boolean @default(false)
-  obs      String?
-
-  MedicalRecord   MedicalRecord                  @relation(fields: [medicalRecordId], references: [id])
-  medicalRecordId Int
-  Prescriber      Doctor                         @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
-  prescriberId    Int
-  Executors       ExecutorsMedicalPrescription[]
+  @@index([medicalRecordId], map: "MedicalPrescription_medicalRecordId_fkey")
+  @@index([prescriberId], map: "MedicalPrescription_prescriberId_fkey")
 }
 
 model MedicalRecord {
   id                  Int                   @id @default(autoincrement())
-  patient             Patient               @relation(fields: [patientId], references: [id])
   patientId           Int                   @unique
-  NursePrescription   NursePrescription[]
+  patient             Patient               @relation(fields: [patientId], references: [id])
   MedicalPrescription MedicalPrescription[]
+  NursePrescription   NursePrescription[]
   NurseReport         NurseReport[]
   TeamReport          TeamReport[]
 }
 
 model TeamReport {
-  id              Int            @id @default(autoincrement())
-  reportDate      DateTime       @default(now())
+  id              Int           @id @default(autoincrement())
+  reportDate      DateTime      @default(now())
   report          String
-  signatory       User           @relation(fields: [userId], references: [id])
   userId          Int
-  MedicalRecord   MedicalRecord? @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId Int
+  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  signatory       User          @relation(fields: [userId], references: [id])
+
+  @@index([medicalRecordId], map: "TeamReport_medicalRecordId_fkey")
+  @@index([userId], map: "TeamReport_userId_fkey")
 }
 
 model Nurse {
-  coren       String        @unique
-  active      Boolean       @default(true)
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int           @unique
-  NurseReport NurseReport[]
-
-  NursePrescriber      NursePrescription[]            @relation("nursePrescriber")
-  NurseExecutor        NursePrescription[]            @relation("nurseExecutor")
+  coren                String                         @unique
+  active               Boolean                        @default(true)
+  userId               Int                            @unique
+  user                 User                           @relation(fields: [userId], references: [id], onDelete: Cascade)
   NurseExecutorMedical ExecutorsMedicalPrescription[] @relation("nurseExecutorMedical")
+  NurseExecutor        NursePrescription[]            @relation("nurseExecutor")
+  NursePrescriber      NursePrescription[]            @relation("nursePrescriber")
+  NurseReport          NurseReport[]
 }
 
 model NursePrescription {
@@ -174,35 +173,38 @@ model NursePrescription {
   realized         Boolean       @default(false)
   obs              String?
   executionDate    DateTime?
-  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
   medicalRecordId  Int
-  Prescriber       Nurse         @relation("nursePrescriber", fields: [prescriberId], references: [userId])
   prescriberId     Int
-  Executor         Nurse?        @relation("nurseExecutor", fields: [executorId], references: [userId])
   executorId       Int?
-  NurseReport      NurseReport?
+  Executor         Nurse?        @relation("nurseExecutor", fields: [executorId], references: [userId])
+  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  Prescriber       Nurse         @relation("nursePrescriber", fields: [prescriberId], references: [userId])
+
+  @@index([executorId], map: "NursePrescription_executorId_fkey")
+  @@index([medicalRecordId], map: "NursePrescription_medicalRecordId_fkey")
+  @@index([prescriberId], map: "NursePrescription_prescriberId_fkey")
 }
 
 model NurseReport {
-  id                             Int                           @id @default(autoincrement())
-  reportDate                     DateTime                      @default(now())
-  report                         String
-  signatory                      Nurse                         @relation(fields: [signatoryId], references: [userId])
-  signatoryId                    Int
-  MedicalRecord                  MedicalRecord                 @relation(fields: [medicalRecordId], references: [id])
-  medicalRecordId                Int
-  MedicalPrescription            ExecutorsMedicalPrescription? @relation(fields: [executorsMedicalPrescriptionId], references: [id])
-  executorsMedicalPrescriptionId Int?                          @unique
-  NursePrescription              NursePrescription?            @relation(fields: [nursePrescriptionId], references: [id])
-  nursePrescriptionId            Int?                          @unique
+  id              Int           @id @default(autoincrement())
+  reportDate      DateTime      @default(now())
+  report          String
+  medicalRecordId Int
+  signatoryId     Int           @unique
+  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  signatory       Nurse         @relation(fields: [signatoryId], references: [userId])
+
+  @@index([medicalRecordId], map: "NurseReport_medicalRecordId_fkey")
+  @@index([signatoryId], map: "NurseReport_signatoryId_fkey")
 }
 
 model ExecutorsMedicalPrescription {
-  id                    Int                  @id @default(autoincrement())
-  MedicalPrescription   MedicalPrescription? @relation(fields: [medicalPrescriptionId], references: [id])
-  medicalPrescriptionId Int?                 @unique
-  Executor              Nurse?               @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
-  executorId            Int?
-  executionDate         DateTime             @default(now()) @db.DateTime(0)
-  NurseReport           NurseReport?
+  id                    Int                 @id @default(autoincrement())
+  medicalPrescriptionId Int                 @unique
+  executorId            Int
+  executionDate         DateTime            @default(now()) @db.DateTime(0)
+  Executor              Nurse               @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
+  MedicalPrescription   MedicalPrescription @relation(fields: [medicalPrescriptionId], references: [id])
+
+  @@index([executorId], map: "ExecutorsMedicalPrescription_executorId_fkey")
 }
