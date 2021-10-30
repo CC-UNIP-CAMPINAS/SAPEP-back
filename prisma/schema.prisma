@@ -113,20 +113,20 @@ model Adm {
 }
 
 model MedicalPrescription {
-  id                     Int                           @id @default(autoincrement())
+  id                     Int                            @id @default(autoincrement())
   drug                   String
   drugDosage             String
   drugWay                String
   administrationInterval String
-  prescriptionDate       DateTime                      @default(now())
-  realized               Boolean                       @default(false)
+  prescriptionDate       DateTime                       @default(now())
+  realized               Boolean                        @default(false)
   obs                    String?
   medicalRecordId        Int
   prescriberId           Int
   administrationCount    Int
-  MedicalRecord          MedicalRecord                 @relation(fields: [medicalRecordId], references: [id])
-  Prescriber             Doctor                        @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
-  Executors              ExecutorsMedicalPrescription?
+  MedicalRecord          MedicalRecord                  @relation(fields: [medicalRecordId], references: [id])
+  Prescriber             Doctor                         @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
+  Executors              ExecutorsMedicalPrescription[]
 
   @@index([medicalRecordId], map: "MedicalPrescription_medicalRecordId_fkey")
   @@index([prescriberId], map: "MedicalPrescription_prescriberId_fkey")
