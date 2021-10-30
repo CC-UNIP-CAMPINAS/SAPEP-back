@@ -53,7 +53,7 @@ class UserController {
         } else {
             return this.user.findFirst({
                 where: { email },
-                include: { Doctor: true },
+                include: { Doctor: true, Nurse: true },
             });
         }
     }
