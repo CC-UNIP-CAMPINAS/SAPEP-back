@@ -43,6 +43,7 @@ const include = {
                 },
                 NursePrescription: {
                     select: {
+                        id: true,
                         executionDate: true,
                         obs: true,
                         prescription: true,
