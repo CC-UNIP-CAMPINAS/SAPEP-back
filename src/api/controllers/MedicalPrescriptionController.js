@@ -39,6 +39,12 @@ class MedicalPrescriptionController {
 
   async create(req, res) {
     try {
+      if (req.body.administrationCount <= 0) {
+        return res
+          .status(errorCodes.BAD_REQUEST)
+          .json({ message: "administrationCount zerado ou negativo." });
+      }
+
       const medicalPrescription = await this.medicalPrescription.create({
         data: {
           ...req.body,
