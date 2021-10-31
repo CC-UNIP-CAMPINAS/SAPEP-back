@@ -10,21 +10,12 @@ module.exports = (app) => {
       obs: Joi.string().optional(),
       prescription: Joi.string().required(),
       medicalRecordId: Joi.number().required(),
-      prescriberId: Joi.number().required(),
-    }),
-  };
-
-  const updateValidation = {
-    body: Joi.object({
-      obs: Joi.string().required(),
-      id: Joi.number().required(),
     }),
   };
 
   const updateRealizedValidation = {
     body: Joi.object({
       id: Joi.number().required(),
-      executorId: Joi.number().required(),
     }),
   };
 
@@ -33,12 +24,25 @@ module.exports = (app) => {
     [
       verifyJWT,
       (req, res, next) =>
-        verifyGroup(req, res, next, ["ENFERMAGEM", "MEDICOS", "ROOT"]),
+        verifyGroup(req, res, next, ["ENFERMAGEM", "MEDICOS"]),
     ],
     (req, res) => {
       nursePrescriptionController.findAll(req, res);
     }
   );
+
+  app.get(
+    "/nurse-prescription/:id",
+    [
+      verifyJWT,
+      (req, res, next) =>
+        verifyGroup(req, res, next, ["ENFERMAGEM", "MEDICOS"]),
+    ],
+    (req, res) => {
+      nursePrescriptionController.findOneById(req, res);
+    }
+  );
+
   app.post(
     "/nurse-prescription",
     [
@@ -50,28 +54,7 @@ module.exports = (app) => {
       nursePrescriptionController.create(req, res);
     }
   );
-  app.get(
-    "/nurse-prescription/:id",
-    [
-      verifyJWT,
-      (req, res, next) =>
-        verifyGroup(req, res, next, ["ENFERMAGEM", "MEDICOS", "ROOT"]),
-    ],
-    (req, res) => {
-      nursePrescriptionController.findOneById(req, res);
-    }
-  );
-  app.patch(
-    "/nurse-prescription",
-    [
-      validate(updateValidation),
-      verifyJWT,
-      (req, res, next) => verifyGroup(req, res, next, ["ENFERMAGEM"]),
-    ],
-    (req, res) => {
-      nursePrescriptionController.update(req, res);
-    }
-  );
+
   app.patch(
     "/nurse-prescription/set-realized",
     [
