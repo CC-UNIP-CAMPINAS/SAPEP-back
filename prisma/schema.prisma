@@ -201,11 +201,12 @@ model NurseReport {
 
 model ExecutorsMedicalPrescription {
   id                    Int                 @id @default(autoincrement())
-  medicalPrescriptionId Int                 @unique
+  medicalPrescriptionId Int
   executorId            Int
   executionDate         DateTime            @default(now()) @db.DateTime(0)
   Executor              Nurse               @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
   MedicalPrescription   MedicalPrescription @relation(fields: [medicalPrescriptionId], references: [id])
 
   @@index([executorId], map: "ExecutorsMedicalPrescription_executorId_fkey")
+  @@index([medicalPrescriptionId], map: "ExecutorsMedicalPrescription_medicalPrescriptionId_key")
 }
