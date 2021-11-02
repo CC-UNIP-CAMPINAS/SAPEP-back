@@ -39,6 +39,7 @@ const include = {
                         administrationCount: true,
                         realized: true,
                         obs: true,
+                        id: true,
                     },
                 },
                 NursePrescription: {
