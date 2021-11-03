@@ -13,6 +13,7 @@ model User {
   password   String
   createdAt  DateTime     @default(now()) @db.DateTime(0)
   updatedAt  DateTime     @default(now()) @updatedAt @db.DateTime(0)
+  active     Boolean      @default(true)
   groupId    Int?
   phone      String?
   gender     String       @default("INDEFINIDO")
@@ -41,32 +42,11 @@ model Jwt {
 }
 
 model Group {
-  id              Int               @id @default(autoincrement())
-  createdAt       DateTime          @default(now()) @db.DateTime(0)
-  updatedAt       DateTime          @updatedAt @db.DateTime(0)
-  name            String            @unique @db.VarChar(255)
-  groupPermission GroupPermission[]
-  User            User[]
-}
-
-model Permission {
-  id              Int               @id @default(autoincrement())
-  name            String
-  createdAt       DateTime          @default(now()) @db.DateTime(0)
-  updatedAt       DateTime          @updatedAt @db.DateTime(0)
-  groupPermission GroupPermission[]
-}
-
-model GroupPermission {
-  groupId      Int
-  permissionId Int
-  createdAt    DateTime   @default(now()) @db.DateTime(0)
-  updatedAt    DateTime   @updatedAt @db.DateTime(0)
-  permission   Permission @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  group        Group      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@id([groupId, permissionId])
-  @@index([permissionId], map: "GroupPermission_permissionId_fkey")
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+  name      String   @unique @db.VarChar(255)
+  User      User[]
 }
 
 model LinkReset {
@@ -101,15 +81,13 @@ model Doctor {
   crm               String                @unique
   area              String
   userId            Int                   @unique
-  active            Boolean               @default(true)
   user              User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   MedicalPrescriber MedicalPrescription[] @relation("medicalPrescriber")
 }
 
 model Adm {
-  userId Int     @unique
-  active Boolean @default(true)
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MedicalPrescription {
@@ -157,7 +135,6 @@ model TeamReport {
 
 model Nurse {
   coren                String                         @unique
-  active               Boolean                        @default(true)
   userId               Int                            @unique
   user                 User                           @relation(fields: [userId], references: [id], onDelete: Cascade)
   NurseExecutorMedical ExecutorsMedicalPrescription[] @relation("nurseExecutorMedical")

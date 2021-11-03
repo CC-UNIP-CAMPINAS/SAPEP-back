@@ -25,6 +25,11 @@ class AuthController {
             const user = await this.userController.findOne(email, false);
 
             if (user) {
+                if (!user.active)
+                    return res
+                        .status(errorCodes.NOT_AUTHORIZED)
+                        .json({ message: "Usuário desativado.", payload: { auth: false } });
+
                 if (await compare(password, user.password)) {
                     delete user.password;
                     const jwt = await this.jwtController.create(user.id);

@@ -17,7 +17,10 @@ class JwtController {
     }
 
     async findOne(token) {
-        return this.jwt.findUnique({ where: { token } });
+        return this.jwt.findUnique({
+            where: { token },
+            select: { idUser: true, token: true, User: { select: { active: true } } },
+        });
     }
 
     async create(idUser) {

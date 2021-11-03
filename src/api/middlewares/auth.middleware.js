@@ -20,6 +20,12 @@ async function verifyJWT(req, res, next) {
                 .send({ status: statusTypes.NOT_AUTHORIZED, message: "Token JWT faltante." });
 
         const jwtObject = await jwtController.findOne(token); // NOTE Procura pelo token no DB
+        if (!jwtObject.User.active) {
+            return res.status(errorCodes.NOT_AUTHORIZED).send({
+                status: statusTypes.NOT_AUTHORIZED,
+                message: "Usuário desativado.",
+            });
+        }
 
         const result = await jwt.verify(jwtObject.token, process.env.JWT_KEY); // NOTE Verifica se o token achado é válido
 
@@ -39,14 +45,12 @@ async function verifyJWT(req, res, next) {
     }
 }
 
-
 async function verifyGroup(req, res, next, allowedGroups) {
-    const permission = allowedGroups.includes(req.group)
+    const permission = allowedGroups.includes(req.group);
 
     if (permission) {
         next();
-    }
-    else {
+    } else {
         return res
             .status(errorCodes.NOT_AUTHORIZED)
             .send({ status: statusTypes.NOT_AUTHORIZED, message: "Usuário sem permissão do recurso." });
