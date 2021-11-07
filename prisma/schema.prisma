@@ -173,7 +173,6 @@ model NurseReport {
 
   @@index([medicalRecordId], map: "NurseReport_medicalRecordId_fkey")
   @@index([signatoryId], map: "NurseReport_signatoryId_fkey")
-  @@index([signatoryId], map: "NurseReport_signatoryId_key")
 }
 
 model ExecutorsMedicalPrescription {
