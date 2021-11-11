@@ -22,10 +22,10 @@ model User {
   Adm        Adm?
   Doctor     Doctor?
   Jwts       Jwt?
-  LinkReset  LinkReset[]
   Nurse      Nurse?
   TeamReport TeamReport[]
 
+  LinkResetEmail LinkResetEmail?
   @@index([groupId], map: "User_groupId_fkey")
 }
 
@@ -47,18 +47,6 @@ model Group {
   updatedAt DateTime @updatedAt @db.DateTime(0)
   name      String   @unique @db.VarChar(255)
   User      User[]
-}
-
-model LinkReset {
-  id        Int      @id @default(autoincrement())
-  link      String   @db.VarChar(255)
-  expire    DateTime @db.DateTime(0)
-  idUser    Int
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
-  User      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
-
-  @@index([idUser], map: "LinkReset_idUser_fkey")
 }
 
 model Patient {
@@ -185,4 +173,13 @@ model ExecutorsMedicalPrescription {
 
   @@index([executorId], map: "ExecutorsMedicalPrescription_executorId_fkey")
   @@index([medicalPrescriptionId], map: "ExecutorsMedicalPrescription_medicalPrescriptionId_key")
+}
+
+model LinkResetEmail {
+  id       Int      @id @default(autoincrement())
+  url      String   @unique
+  expire   DateTime
+  newEmail String
+  User     User     @relation(fields: [userId], references: [id])
+  userId   Int      @unique
 }
