@@ -14,6 +14,8 @@
     "Nurse",
     "Adm",
     "TeamReport",
-    "NurseReport"
+    "NurseReport",
+    "LinkResetEmail",
+    "Service: Nodemailer"
   ]
 }
