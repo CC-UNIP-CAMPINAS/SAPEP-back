@@ -19,7 +19,7 @@ module.exports = (app) => {
     };
 
     const controller = new LinkResetPasswordController();
-    app.post("/reset-password", [validate(createValidation), verifyJWT], (req, res, next) => {
+    app.post("/reset-password", [validate(createValidation)], (req, res, next) => {
         controller.create(req, res);
     });
 
