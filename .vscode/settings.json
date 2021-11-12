@@ -16,6 +16,7 @@
     "TeamReport",
     "NurseReport",
     "LinkResetEmail",
-    "Service: Nodemailer"
+    "Service: Nodemailer",
+    "LinkResetPassword"
   ]
 }
