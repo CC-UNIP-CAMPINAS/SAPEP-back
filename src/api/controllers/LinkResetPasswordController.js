@@ -19,6 +19,28 @@ class LinkResetPasswordController {
         return now.isAfter(dateToCompare);
     }
 
+    async findOne(req, res) {
+        try {
+            const id = req.params.id;
+            const linkReset = await this.linkResetPassword.findFirst({
+                where: { url: { contains: id } },
+            });
+
+            if (linkReset) {
+                if (this.isExpire(linkReset.expire)) {
+                    res.status(errorCodes.BAD_REQUEST).json({ message: "Link expirado." });
+                } else {
+                    res.json(linkReset);
+                }
+            } else {
+                res.status(errorCodes.NOT_FOUND).json({ message: "Link inválido." });
+            }
+        } catch (error) {
+            console.log(error);
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
+
     async confirm(req, res) {
         try {
             const { newPassword } = req.body;
