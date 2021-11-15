@@ -3,22 +3,36 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
+    "prisma": {
+        "seed": "node prisma/seed.js"
+    },
     "scripts": {
         "start": "node index.js",
+        "predev": "prisma generate",
         "dev": "nodemon index.js",
-        "migrate": "sequelize-cli db:migrate"
+        "migrate": "prisma migrate dev",
+        "sgbd": "prisma studio",
+        "uml": "npx prisma-uml ./prisma/schema.prisma -o svg -f ./prisma/uml/schemas_uml.svg"
     },
     "dependencies": {
+        "@prisma/client": "^3.3.0",
+        "bcrypt": "^5.0.1",
+        "cep-promise": "^4.1.1",
+        "consign": "^0.1.6",
+        "cookie-parser": "^1.4.5",
         "cors": "^2.8.5",
+        "dayjs": "^1.10.7",
         "dotenv": "^10.0.0",
         "express": "^4.17.1",
+        "express-validation": "^3.0.8",
         "helmet": "^4.6.0",
-        "mariadb": "^2.5.4",
-        "sequelize": "^6.6.5"
+        "jsonwebtoken": "^8.5.1",
+        "nodemailer": "^6.7.0",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "jest": "^27.0.6",
         "nodemon": "^2.0.12",
-        "sequelize-cli": "^6.2.0"
+        "prisma": "^3.3.0"
     }
 }

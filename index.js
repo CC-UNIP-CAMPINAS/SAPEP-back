@@ -1,5 +1,14 @@
 require("dotenv/config");
-const startApi = require("./src/api/config/express.config.js");
-const sequelize = require("./src/api/services/sequelize/db.service")
+const { startApi } = require("./src/api/config/express.config.js");
+const PrismaService = require("./src/api/services/prisma/prisma.service");
 
-startApi();
+async function Main() {
+    try {
+        await startApi();
+        await new PrismaService().testConnection();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+Main();

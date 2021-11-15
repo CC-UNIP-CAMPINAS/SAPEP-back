@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int          @id @default(autoincrement())
+  email      String       @unique
+  password   String
+  createdAt  DateTime     @default(now()) @db.DateTime(0)
+  updatedAt  DateTime     @default(now()) @updatedAt @db.DateTime(0)
+  active     Boolean      @default(true)
+  groupId    Int?
+  phone      String?
+  gender     String       @default("INDEFINIDO")
+  name       String
+  Groups     Group?       @relation(fields: [groupId], references: [id])
+  Adm        Adm?
+  Doctor     Doctor?
+  Jwts       Jwt?
+  Nurse      Nurse?
+  TeamReport TeamReport[]
+
+  LinkResetEmail    LinkResetEmail?
+  LinkResetPassword LinkResetPassword?
+
+  @@index([groupId], map: "User_groupId_fkey")
+}
+
+model Jwt {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique @db.VarChar(255)
+  expire    DateTime @db.DateTime(0)
+  idUser    Int      @unique
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+  User      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
+
+  @@index([idUser])
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+  name      String   @unique @db.VarChar(255)
+  User      User[]
+}
+
+model Patient {
+  id              Int            @id @default(autoincrement())
+  name            String
+  lastName        String
+  addressNumber   String?        @default("S/N")
+  cep             String?
+  birthday        DateTime       @db.Date
+  phone           String?        @default("NÃO CONSTA")
+  healthInsurance String?        @default("NÃO CONSTA")
+  cpf             String         @unique
+  rg              String         @unique
+  gender          String         @default("INDEFINIDO")
+  complement      String?        @default("NÃO CONSTA")
+  MedicalRecord   MedicalRecord?
+}
+
+model Doctor {
+  crm               String                @unique
+  area              String
+  userId            Int                   @unique
+  user              User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  MedicalPrescriber MedicalPrescription[] @relation("medicalPrescriber")
+}
+
+model Adm {
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MedicalPrescription {
+  id                     Int                            @id @default(autoincrement())
+  drug                   String
+  drugDosage             String
+  drugWay                String
+  administrationInterval String
+  prescriptionDate       DateTime                       @default(now())
+  realized               Boolean                        @default(false)
+  obs                    String?
+  medicalRecordId        Int
+  prescriberId           Int
+  administrationCount    Int
+  MedicalRecord          MedicalRecord                  @relation(fields: [medicalRecordId], references: [id])
+  Prescriber             Doctor                         @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
+  Executors              ExecutorsMedicalPrescription[]
+  canceled               Boolean                        @default(false)
+
+  @@index([medicalRecordId], map: "MedicalPrescription_medicalRecordId_fkey")
+  @@index([prescriberId], map: "MedicalPrescription_prescriberId_fkey")
+}
+
+model MedicalRecord {
+  id                  Int                   @id @default(autoincrement())
+  patientId           Int                   @unique
+  patient             Patient               @relation(fields: [patientId], references: [id])
+  MedicalPrescription MedicalPrescription[]
+  NursePrescription   NursePrescription[]
+  NurseReport         NurseReport[]
+  TeamReport          TeamReport[]
+}
+
+model TeamReport {
+  id              Int           @id @default(autoincrement())
+  reportDate      DateTime      @default(now())
+  report          String
+  userId          Int
+  medicalRecordId Int
+  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  signatory       User          @relation(fields: [userId], references: [id])
+
+  @@index([medicalRecordId], map: "TeamReport_medicalRecordId_fkey")
+  @@index([userId], map: "TeamReport_userId_fkey")
+}
+
+model Nurse {
+  coren                String                         @unique
+  userId               Int                            @unique
+  user                 User                           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  NurseExecutorMedical ExecutorsMedicalPrescription[] @relation("nurseExecutorMedical")
+  NurseExecutor        NursePrescription[]            @relation("nurseExecutor")
+  NursePrescriber      NursePrescription[]            @relation("nursePrescriber")
+  NurseReport          NurseReport[]
+}
+
+model NursePrescription {
+  id               Int           @id @default(autoincrement())
+  prescription     String
+  prescriptionDate DateTime      @default(now())
+  realized         Boolean       @default(false)
+  obs              String?
+  executionDate    DateTime?
+  medicalRecordId  Int
+  prescriberId     Int
+  executorId       Int?
+  canceled         Boolean       @default(false)
+  Executor         Nurse?        @relation("nurseExecutor", fields: [executorId], references: [userId])
+  MedicalRecord    MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  Prescriber       Nurse         @relation("nursePrescriber", fields: [prescriberId], references: [userId])
+
+  @@index([executorId], map: "NursePrescription_executorId_fkey")
+  @@index([medicalRecordId], map: "NursePrescription_medicalRecordId_fkey")
+  @@index([prescriberId], map: "NursePrescription_prescriberId_fkey")
+}
+
+model NurseReport {
+  id              Int           @id @default(autoincrement())
+  reportDate      DateTime      @default(now())
+  report          String
+  medicalRecordId Int
+  signatoryId     Int
+  MedicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  signatory       Nurse         @relation(fields: [signatoryId], references: [userId])
+
+  @@index([medicalRecordId], map: "NurseReport_medicalRecordId_fkey")
+  @@index([signatoryId], map: "NurseReport_signatoryId_fkey")
+}
+
+model ExecutorsMedicalPrescription {
+  id                    Int                 @id @default(autoincrement())
+  medicalPrescriptionId Int
+  executorId            Int
+  executionDate         DateTime            @default(now()) @db.DateTime(0)
+  Executor              Nurse               @relation("nurseExecutorMedical", fields: [executorId], references: [userId])
+  MedicalPrescription   MedicalPrescription @relation(fields: [medicalPrescriptionId], references: [id])
+
+  @@index([executorId], map: "ExecutorsMedicalPrescription_executorId_fkey")
+  @@index([medicalPrescriptionId], map: "ExecutorsMedicalPrescription_medicalPrescriptionId_key")
+}
+
+model LinkResetEmail {
+  id       Int      @id @default(autoincrement())
+  url      String   @unique
+  expire   DateTime
+  newEmail String
+  User     User     @relation(fields: [userId], references: [id])
+  userId   Int      @unique
+}
+
+model LinkResetPassword {
+  id     Int      @id @default(autoincrement())
+  url    String   @unique
+  expire DateTime
+  User   User     @relation(fields: [userId], references: [id])
+  userId Int      @unique
+}

@@ -1,9 +1,23 @@
-const { Router } = require("express");
+const AuthController = require("../controllers/AuthController");
+const { verifyJWT } = require("../middlewares/auth.middleware");
 
-const route = Router();
+module.exports = (app) => {
+    const authController = new AuthController();
 
-route.get("/", (req, res) => {
-  res.send({ app: "SAPEP", date: new Date() });
-});
+    app.get("/", (_, res) => {
+        res.send({ app: "SAPEP", date: new Date() });
+    });
 
-module.exports = route;
+    app.post("/login", (req, res) => {
+        authController.login(req, res);
+    });
+
+    app.post("/login-jwt", [verifyJWT], (req, res) => {
+        authController.loginJwt(req, res);
+    });
+
+    app.get("/logoff", [verifyJWT], (_, res) => {
+        res.clearCookie("sapep_token");
+        res.json({ message: "Usuário deslogado" });
+    });
+};
