@@ -95,6 +95,7 @@ model MedicalPrescription {
   MedicalRecord          MedicalRecord                  @relation(fields: [medicalRecordId], references: [id])
   Prescriber             Doctor                         @relation("medicalPrescriber", fields: [prescriberId], references: [userId])
   Executors              ExecutorsMedicalPrescription[]
+  canceled               Boolean                        @default(false)
 
   @@index([medicalRecordId], map: "MedicalPrescription_medicalRecordId_fkey")
   @@index([prescriberId], map: "MedicalPrescription_prescriberId_fkey")
