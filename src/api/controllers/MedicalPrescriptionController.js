@@ -69,6 +69,7 @@ class MedicalPrescriptionController {
                             user: {
                                 select: {
                                     name: true,
+                                    email: true,
                                 },
                             },
                         },
