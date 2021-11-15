@@ -27,10 +27,12 @@ const include = {
                                 user: {
                                     select: {
                                         name: true,
+                                        email: true,
                                     },
                                 },
                             },
                         },
+                        canceled: true,
                         prescriptionDate: true,
                         drug: true,
                         drugDosage: true,
