@@ -11,9 +11,16 @@ class NurseController {
     nurseProperties = {
         coren: true,
         userId: true,
-        active: true,
         user: {
-            select: { email: true, gender: true, name: true, phone: true, groupId: true, updatedAt: true },
+            select: {
+                active: true,
+                email: true,
+                gender: true,
+                name: true,
+                phone: true,
+                groupId: true,
+                updatedAt: true,
+            },
         },
     };
 
@@ -22,7 +29,15 @@ class NurseController {
             const allNurses = await this.nurse.findMany({
                 include: {
                     user: {
-                        select: { updatedAt: true, email: true, gender: true, groupId: true, name: true, phone: true },
+                        select: {
+                            active: true,
+                            updatedAt: true,
+                            email: true,
+                            gender: true,
+                            groupId: true,
+                            name: true,
+                            phone: true,
+                        },
                     },
                 },
             });
@@ -38,7 +53,15 @@ class NurseController {
                 where: { coren: req.body.coren },
                 include: {
                     user: {
-                        select: { updatedAt: true, email: true, gender: true, groupId: true, name: true, phone: true },
+                        select: {
+                            active: true,
+                            updatedAt: true,
+                            email: true,
+                            gender: true,
+                            groupId: true,
+                            name: true,
+                            phone: true,
+                        },
                     },
                 },
             });
@@ -60,6 +83,7 @@ class NurseController {
                 include: {
                     user: {
                         select: {
+                            active: true,
                             name: true,
                             email: true,
                             gender: true,
@@ -116,7 +140,7 @@ class NurseController {
             await this.nurse.update({
                 where: { userId: +req.params.userId },
                 data: {
-                    active: false,
+                    user: { update: { active: false } },
                 },
             });
 
@@ -135,7 +159,7 @@ class NurseController {
             await this.nurse.update({
                 where: { userId: +req.params.userId },
                 data: {
-                    active: true,
+                    user: { update: { active: true } },
                 },
             });
 

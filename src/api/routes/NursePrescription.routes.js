@@ -13,6 +13,12 @@ module.exports = (app) => {
         }),
     };
 
+    const cancelValidation = {
+        params: Joi.object({
+            id: Joi.number().required(),
+        }),
+    };
+
     const updateRealizedValidation = {
         body: Joi.object({
             id: Joi.number().required(),
@@ -52,6 +58,14 @@ module.exports = (app) => {
         ],
         (req, res) => {
             nursePrescriptionController.setRealized(req, res);
+        }
+    );
+
+    app.patch(
+        "/nurse-prescription/:id/set-canceled",
+        [validate(cancelValidation), verifyJWT, (req, res, next) => verifyGroup(req, res, next, ["ENFERMAGEM"])],
+        (req, res) => {
+            nursePrescriptionController.setCanceled(req, res);
         }
     );
 };

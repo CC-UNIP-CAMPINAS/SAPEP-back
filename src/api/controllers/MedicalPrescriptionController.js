@@ -1,3 +1,5 @@
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
 const { errorCodes } = require("../config/express.config");
 const PrismaService = require("../services/prisma/prisma.service");
 
@@ -67,6 +69,7 @@ class MedicalPrescriptionController {
                             user: {
                                 select: {
                                     name: true,
+                                    email: true,
                                 },
                             },
                         },
@@ -79,6 +82,7 @@ class MedicalPrescriptionController {
                     administrationCount: true,
                     realized: true,
                     obs: true,
+                    canceled: true,
                 },
             });
             res.json(medicalPrescription);
@@ -118,8 +122,14 @@ class MedicalPrescriptionController {
         try {
             const medicalPrescription = await this.medicalPrescription.findUnique({
                 where: { id: +req.body.id },
-                select: { realized: true, administrationCount: true, Executors: true },
+                select: { canceled: true, realized: true, administrationCount: true, Executors: true },
             });
+
+            if (medicalPrescription.canceled) {
+                return res
+                    .status(errorCodes.BAD_REQUEST)
+                    .json({ message: "Não é possível executar uma prescrição cancelada." });
+            }
 
             if (!medicalPrescription)
                 return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição médica não encontrada." });
@@ -142,7 +152,7 @@ class MedicalPrescriptionController {
                             Executors: {
                                 select: {
                                     executionDate: true,
-                                    Executor: { select: { user: { select: { name: true } } } },
+                                    Executor: { select: { user: { select: { name: true, email: true } } } },
                                 },
                             },
                         },
@@ -163,6 +173,51 @@ class MedicalPrescriptionController {
                 return res.status(errorCodes.CONFLICT).json({ message: "Está prescrição já foi executada." });
             }
         } catch (error) {
+            if (error.code === "P2025") {
+                return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição médica não encontrada." });
+            }
+            return res.status(errorCodes.INTERNAL_SERVER).json(error.message);
+        }
+    }
+
+    async setCanceled(req, res) {
+        try {
+            dayjs.extend(utc);
+            const prescriptionToCompare = await this.medicalPrescription.findFirst({
+                include: { Executors: true },
+                where: { id: +req.params.id, Prescriber: { userId: req.idUser } },
+            });
+
+            if (!prescriptionToCompare) {
+                return res
+                    .status(errorCodes.NOT_AUTHORIZED)
+                    .json({ message: "Não é possível cancelar uma prescrição que você não criou." });
+            }
+
+            if (prescriptionToCompare.Executors.length > 0) {
+                return res
+                    .status(errorCodes.NOT_AUTHORIZED)
+                    .json({ message: "Não é possível cancelar uma prescrição que já teve alguma administração." });
+            }
+
+            if (dayjs.utc().isAfter(dayjs.utc(prescriptionToCompare.prescriptionDate).add(24, "hours"))) {
+                return res
+                    .status(errorCodes.NOT_AUTHORIZED)
+                    .json({ message: "Não é possível cancelar uma prescrição com mais de 24 horas de criação." });
+            }
+
+            const prescription = await this.medicalPrescription.update({
+                where: { id: +req.params.id },
+                data: { canceled: true },
+                select: {
+                    id: true,
+                    canceled: true,
+                },
+            });
+
+            res.json(prescription);
+        } catch (error) {
+            console.log(error);
             if (error.code === "P2025") {
                 return res.status(errorCodes.BAD_REQUEST).json({ message: "Prescrição médica não encontrada." });
             }

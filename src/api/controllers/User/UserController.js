@@ -8,6 +8,7 @@ class UserController {
     }
 
     userProperties = {
+        active: true,
         name: true,
         email: true,
         gender: true,

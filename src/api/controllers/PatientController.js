@@ -27,10 +27,12 @@ const include = {
                                 user: {
                                     select: {
                                         name: true,
+                                        email: true,
                                     },
                                 },
                             },
                         },
+                        canceled: true,
                         prescriptionDate: true,
                         drug: true,
                         drugDosage: true,
@@ -44,6 +46,7 @@ const include = {
                 },
                 NursePrescription: {
                     select: {
+                        canceled: true,
                         id: true,
                         executionDate: true,
                         obs: true,
@@ -51,7 +54,7 @@ const include = {
                         realized: true,
                         prescriptionDate: true,
                         Executor: { select: { user: { select: { name: true } } } },
-                        Prescriber: { select: { user: { select: { name: true } } } },
+                        Prescriber: { select: { user: { select: { name: true, email: true } } } },
                     },
                 },
                 TeamReport: {
