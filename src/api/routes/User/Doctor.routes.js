@@ -11,7 +11,7 @@ module.exports = (app) => {
       area: Joi.string().required(),
       email: Joi.string().required(),
       password: Joi.string().required(),
-      phone: Joi.string().optional(),
+      phone: Joi.string().optional().empty(""),
       gender: Joi.string().optional(),
       name: Joi.string().required(),
     }),
@@ -21,7 +21,7 @@ module.exports = (app) => {
     body: Joi.object({
       userParams: Joi.object({
         email: Joi.string().required(),
-        phone: Joi.string().optional(),
+        phone: Joi.string().optional().empty(""),
         gender: Joi.string().optional(),
         name: Joi.string().required(),
       }).required(),
