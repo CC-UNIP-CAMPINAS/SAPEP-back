@@ -83,6 +83,7 @@ class MedicalPrescriptionController {
                     realized: true,
                     obs: true,
                     canceled: true,
+                    id: true,
                 },
             });
             res.json(medicalPrescription);
