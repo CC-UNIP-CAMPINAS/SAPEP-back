@@ -22,7 +22,7 @@
 -   [Tecnologias 👨‍💻](#tecnologias-)
 -   [Como usar 🔧](#como-usar-)
     -   [Pré Requisitos](#pré-requisitos)
-    -   [Prisma](#prisma-)
+    -   [Prisma](#prisma--%EF%B8%8F⃤)
     -   [Para o desenvolvimento](#para-o-desenvolvimento)
     -   [Para a produção](#para-a-produção)
 -   [Como contribuir? 🤜🤛](#como-contribuir-)
@@ -88,7 +88,7 @@ PASS_EMAIL=SENHA_DO_EMAIL
 
 Ou adicionar os valor para os campos citados acima em sua plataforma de hospedagem.
 
-### Prisma  🏳️‍🌈⃤
+### Prisma 🏳️‍🌈⃤
 
 O projeto usa como ORM o [Prisma](https://www.prisma.io/) configurado para utilizar MySQL/MariaDB como padrão, porém fique livre para mudar o banco de dados principal levando sempre em consideração a documentação do [Prisma](https://www.prisma.io/).
 
