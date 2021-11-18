@@ -88,7 +88,7 @@ PASS_EMAIL=SENHA_DO_EMAIL
 
 Ou adicionar os valor para os campos citados acima em sua plataforma de hospedagem.
 
-### Prisma 🏳️‍🌈⃤
+### Prisma  🏳️‍🌈⃤
 
 O projeto usa como ORM o [Prisma](https://www.prisma.io/) configurado para utilizar MySQL/MariaDB como padrão, porém fique livre para mudar o banco de dados principal levando sempre em consideração a documentação do [Prisma](https://www.prisma.io/).
 
