@@ -22,7 +22,7 @@
 -   [Tecnologias 👨‍💻](#tecnologias-)
 -   [Como usar 🔧](#como-usar-)
     -   [Pré Requisitos](#pré-requisitos)
-    -   [Prisma](#prisma--%EF%B8%8F⃤)
+    -   [Prisma](#prisma-%EF%B8%8F⃤)
     -   [Para o desenvolvimento](#para-o-desenvolvimento)
     -   [Para a produção](#para-a-produção)
 -   [Como contribuir? 🤜🤛](#como-contribuir-)
