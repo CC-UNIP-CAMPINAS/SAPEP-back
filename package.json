@@ -1,12 +1,13 @@
 {
     "name": "sapep",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "index.js",
     "license": "MIT",
     "prisma": {
         "seed": "node prisma/seed.js"
     },
     "scripts": {
+        "prestart": "prisma generate",
         "start": "node index.js",
         "predev": "prisma generate",
         "dev": "nodemon index.js",
